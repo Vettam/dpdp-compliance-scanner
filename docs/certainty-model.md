@@ -20,4 +20,4 @@ Every finding carries two orthogonal axes. There is no severity field.
 
 ## Why certainty, not severity
 
-India has no cookie law. The relevance of a cookie scan under DPDP rests on an inference chain (see the spec §0.3). Some links in that chain are settled, some arguable, some open. The tool's job is to show which is which. Severity would be a product judgement; certainty is a reading of the law, and the reading is versioned and citable.
+India has no cookie law. The relevance of a page scan under DPDP rests on an inference chain (`docs/legal-sources/spec.md` §0.3). The same chain for every data point is `docs/spec-v2.md` §0.2. Some links in that chain are settled, some arguable, some open. The tool's job is to show which is which. Severity would be a product judgement; certainty is a reading of the law, and the reading is versioned and citable.

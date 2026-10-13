@@ -4,7 +4,7 @@ import type { NoticeLintResult } from "./index.js";
 export function renderNoticeLintTerminal(r: NoticeLintResult, color = true): string {
   const c = color ? pc : noColor;
   const lines: string[] = [];
-  lines.push(`${c.bold("dpdp-notice-lint")}  ${r.notice_url || "(notice text)"}`);
+  lines.push(`${c.bold("dpdp notice lint")}  ${r.notice_url || "(notice text)"}`);
   lines.push("");
   const failed = r.checks.filter((x) => x.status === "fail");
   const passed = r.checks.filter((x) => x.status === "pass");

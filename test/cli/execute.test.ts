@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { join } from "node:path";
-import { execute, type CliArgs, type CliDeps } from "../../src/cli/execute.js";
+import { execute, executeMapDiff, type CliArgs, type CliDeps } from "../../src/cli/execute.js";
 import { FixtureEngine } from "../../src/engine/fixture.js";
 
 const rulesDir = join(process.cwd(), "rules");
@@ -134,8 +134,6 @@ function args(over: Partial<CliArgs> = {}): CliArgs {
     browser: "",
     interact: false,
     failOn: "",
-    diffFrom: "",
-    diffTo: "",
     ...over,
   };
 }
@@ -264,7 +262,7 @@ describe("execute", () => {
     expect(getOut()).not.toContain("survived reject");
   });
 
-  it("diffs two ScanResults with --diff-from/--diff-to and writes diff.json", async () => {
+  it("diffs two ScanResults with map diff and writes diff.json", async () => {
     const { deps, getFiles, getOut } = makeDeps();
     await execute(args({ json: true, out: "./diff-a" }), deps);
     const a = getFiles().get(join("./diff-a", "findings.json"))!;
@@ -272,7 +270,10 @@ describe("execute", () => {
     const b = getFiles().get(join("./diff-b", "findings.json"))!;
     getFiles().set("from.json", a);
     getFiles().set("to.json", b);
-    const code = await execute(args({ url: "", diffFrom: "from.json", diffTo: "to.json", out: "./diff-out" }), deps);
+    const code = executeMapDiff(
+      { diffFrom: "from.json", diffTo: "to.json", out: "./diff-out", json: false, ci: false },
+      deps,
+    );
     expect(code).toBe(0);
     expect(getFiles().has(join("./diff-out", "diff.json"))).toBe(true);
     expect(getOut()).toContain("SITE");

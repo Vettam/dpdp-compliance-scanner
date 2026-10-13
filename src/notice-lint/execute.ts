@@ -25,7 +25,7 @@ export interface NoticeLintDeps {
 
 export async function executeNoticeLint(args: NoticeLintArgs, deps: NoticeLintDeps): Promise<number> {
   if (!args.notice) {
-    deps.stderr.write("usage: dpdp-notice-lint <notice-url-or-file> [--scan findings.json] [--json] [--ci]\n");
+    deps.stderr.write("usage: dpdp notice lint <notice-url-or-file> [--scan findings.json] [--json] [--ci]\n");
     deps.exit(2);
     return 2;
   }

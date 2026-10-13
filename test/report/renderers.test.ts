@@ -64,7 +64,7 @@ describe("renderers", () => {
     expect(out).toContain("keep for later");
     expect(out).toContain("SAME VENDOR, DIFFERENT QUESTIONS");
     expect(out).toContain("Save this report as a markdown file by running:");
-    expect(out).toContain("dpdp-cookie-scan https://staging.acme.in --md");
+    expect(out).toContain("dpdp scan page https://staging.acme.in --md");
     expect(out).toContain("./dpdp-scan/findings.md");
     expect(out).toContain("https://sentinel.vettam.ai/rules/<id>");
     await expect(out).toMatchFileSnapshot(snapshotPath("terminal.txt"));
@@ -111,11 +111,11 @@ describe("renderers", () => {
     expect(() => renderJson({} as never)).toThrow();
   });
 
-  it("markdown points at dpdp-notice-lint and prints a captured notice URL", () => {
+  it("markdown points at dpdp notice lint and prints a captured notice URL", () => {
     const sr = fixtureScan();
     sr.banner.notice_url = "https://staging.acme.in/privacy";
     const md = renderMarkdown(sr);
-    expect(md).toContain("dpdp-notice-lint");
+    expect(md).toContain("dpdp notice lint");
     expect(md).toContain("https://staging.acme.in/privacy");
   });
 });

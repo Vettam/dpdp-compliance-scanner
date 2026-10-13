@@ -20,7 +20,7 @@ export function markdownHint(url: string): string {
   const target = url.trim() === "" ? "<url>" : url.trim();
   return [
     "Save this report as a markdown file by running:",
-    `  dpdp-cookie-scan ${shellArg(target)} --md`,
+    `  dpdp scan page ${shellArg(target)} --md`,
     "That creates ./dpdp-scan/findings.md in the folder where you run the command.",
   ].join("\n");
 }

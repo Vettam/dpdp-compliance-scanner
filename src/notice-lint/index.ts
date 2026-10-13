@@ -2,7 +2,7 @@ import type { ScanResult } from "../types.js";
 import type { Tracker } from "../trackers/schema.js";
 
 /**
- * dpdp-notice-lint — checks the *content* of a published privacy notice against
+ * dpdp notice lint — checks the *content* of a published privacy notice against
  * Rule 3 of the DPDP Rules 2025. The scanner captures the inventory; this
  * linter checks the notice itemises each item and carries the structural
  * requirements (withdrawal, grievance, bilingual). Rule 3 logic is not

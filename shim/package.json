@@ -1,0 +1,22 @@
+{
+  "name": "dpdp-cookie-scanner",
+  "version": "1.0.0",
+  "description": "Deprecated shim. Forwards the old bins to dpdp-compliance-scanner.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "bin": {
+    "dpdp-cookie-scanner": "./bin/dpdp-cookie-scanner.js",
+    "dpdp-cookie-scan": "./bin/dpdp-cookie-scan.js",
+    "dpdp-notice-lint": "./bin/dpdp-notice-lint.js"
+  },
+  "dependencies": {
+    "dpdp-compliance-scanner": ">=2"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "files": [
+    "bin",
+    "README.md"
+  ]
+}

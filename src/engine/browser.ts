@@ -11,7 +11,7 @@ import { dirname, join } from "node:path";
  */
 
 export const CHROMIUM_FALLBACK_MESSAGE =
-  "dpdp-cookie-scan: no system Chrome/Edge found; downloading Chromium as a fallback (one-time).\n";
+  "dpdp: no system Chrome/Edge found; downloading Chromium as a fallback (one-time).\n";
 
 export interface DetectBrowserOptions {
   existsSync?: (path: string) => boolean;

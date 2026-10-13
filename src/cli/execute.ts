@@ -8,7 +8,6 @@ import { hasSettledFindings, parseFailOn } from "./fail-on.js";
 import type { ScanEngine } from "../engine/types.js";
 import { ScanResult } from "../types.js";
 import { readRulesVersion } from "../rules/loader.js";
-import { readTrackersVersion } from "../trackers/loader.js";
 
 export interface CliArgs {
   url: string;
@@ -25,8 +24,6 @@ export interface CliArgs {
   browser: string;
   interact: boolean;
   failOn: string;
-  diffFrom: string;
-  diffTo: string;
 }
 
 export interface CliDeps {
@@ -41,7 +38,7 @@ export interface CliDeps {
   trackersDir: string;
 }
 
-const USAGE = "usage: dpdp-cookie-scan <url> [options]\n";
+const USAGE = "usage: dpdp scan page <url> [options]\n";
 
 export async function execute(args: CliArgs, deps: CliDeps): Promise<number> {
   if (args.rulesVersion) {
@@ -54,10 +51,6 @@ export async function execute(args: CliArgs, deps: CliDeps): Promise<number> {
     deps.stderr.write("error: --fail-on accepts only 'settled'\n");
     deps.exit(2);
     return 2;
-  }
-
-  if (args.diffFrom || args.diffTo) {
-    return executeDiff(args, deps);
   }
 
   if (!args.url) {
@@ -121,9 +114,18 @@ export async function execute(args: CliArgs, deps: CliDeps): Promise<number> {
   }
 }
 
-function executeDiff(args: CliArgs, deps: CliDeps): number {
+export interface MapDiffArgs {
+  diffFrom: string;
+  diffTo: string;
+  out: string;
+  json: boolean;
+  ci: boolean;
+}
+
+/** Compare two ScanResult files. Same files and summary as the old --diff-from/--diff-to flags. */
+export function executeMapDiff(args: MapDiffArgs, deps: CliDeps): number {
   if (!args.diffFrom || !args.diffTo) {
-    deps.stderr.write("usage: dpdp-cookie-scan --diff-from <a.json> --diff-to <b.json>\n");
+    deps.stderr.write("usage: dpdp map diff --diff-from <a.json> --diff-to <b.json>\n");
     deps.exit(2);
     return 2;
   }
@@ -167,6 +169,3 @@ function renderDiffSummary(diff: ReturnType<typeof diffScanResults>): string {
   ];
   return lines.join("\n");
 }
-
-// Keep these imported so the bundle includes the version readers for --rules-version.
-void readTrackersVersion;

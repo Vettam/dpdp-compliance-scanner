@@ -11,7 +11,7 @@ import {
 /** Markdown renderer for PR comments and issues (spec §7.3). */
 export function renderMarkdown(sr: ScanResult): string {
   const out: string[] = [];
-  out.push(`# dpdp-cookie-scan — ${hostOf(sr.target.url)}`);
+  out.push(`# dpdp — ${hostOf(sr.target.url)}`);
   out.push("");
   out.push(`> Interpretation as of ${sr.interpretation_as_of}. Indicative, not legal advice. Not a compliance verdict.`);
   out.push("");
@@ -91,7 +91,7 @@ export function renderMarkdown(sr: ScanResult): string {
     out.push(`Notice URL captured: ${sr.banner.notice_url}`);
     out.push("");
   }
-  out.push(`Notice content checks: run dpdp-notice-lint against your published notice.`);
+  out.push(`Notice content checks: run dpdp notice lint against your published notice.`);
   out.push("");
   return out.join("\n");
 }

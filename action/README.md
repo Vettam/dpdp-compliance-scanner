@@ -1,6 +1,6 @@
-# GitHub Action — `dpdp-cookie-scan`
+# GitHub Action — `dpdp`
 
-Thin wrapper around the CLI. It runs `dpdp-cookie-scan --ci`, uploads
+Thin wrapper around the CLI. It runs `dpdp scan page --ci`, uploads
 `findings.json` / `findings.md` as the `dpdp-scan` artifact, and on a
 `pull_request` event posts (or updates) `findings.md` as a PR comment.
 
@@ -9,11 +9,11 @@ and does not say a site is or is not compliant. It does not fail the job
 because findings exist unless you set `fail-on: settled` (opt-in; never
 trips on arguable or open findings).
 
-The Action downloads the `dpdp-cookie-scanner` package and runs the
-`dpdp-cookie-scan` command. Locally that is:
+The Action downloads the `dpdp-compliance-scanner` package and runs
+`dpdp scan page`. Locally that is:
 
 ```bash
-npx --package=dpdp-cookie-scanner dpdp-cookie-scan <url> --ci
+npx dpdp-compliance-scanner scan page <url> --ci
 ```
 
 ## Usage
@@ -31,21 +31,21 @@ jobs:
   scan:
     runs-on: ubuntu-latest
     steps:
-      - uses: Vettam/dpdp-cookie-scanner/action@v0.3.0
+      - uses: Vettam/dpdp-cookie-scanner/action@v2
         with:
           url: https://staging.example.com
-          version: "0.3.0"   # pin the npm package; omit for latest
+          version: "2.0.0"   # pin the npm package; omit for latest
 ```
 
-Pin both the Action ref (`@v0.3.0`) and `version` to the same release so the
-wrapper and the CLI cannot drift.
+Pin the Action ref (`@v2`) and `version` together so the wrapper and the CLI
+cannot drift.
 
 ## Inputs
 
 | Input | Default | Meaning |
 |---|---|---|
 | `url` | *required* | Page to scan |
-| `version` | latest | npm package version of `dpdp-cookie-scanner` |
+| `version` | latest | npm package version of `dpdp-compliance-scanner` |
 | `gpc` | `false` | Send `Sec-GPC: 1` |
 | `include-query` | `false` | Keep query strings in evidence |
 | `timeout` | `15000` | Navigation timeout (ms) |

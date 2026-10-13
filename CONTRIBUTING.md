@@ -4,6 +4,10 @@ This is a public scanner for India's DPDP Act. The interpretation layer
 (rules + tracker classifications) is the product. Code changes and dataset
 changes are both welcome; they are reviewed differently.
 
+Product shape is [`docs/spec-v2.md`](docs/spec-v2.md). Decisions are in
+[`docs/adr/`](docs/adr/). [`docs/legal-sources/spec.md`](docs/legal-sources/spec.md)
+is the page-scanner reference; command names in that file are the v1 names.
+
 Please read this file, then [`docs/contributing-rules.md`](docs/contributing-rules.md)
 before opening a PR that touches `rules/` or `trackers/`. Primary legal texts
 (the Act, Rules, corrigendum, and commencement notification) live as Gazette

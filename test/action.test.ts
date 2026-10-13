@@ -14,8 +14,8 @@ const action = parseYaml(actionText) as {
 };
 
 describe("GitHub Action wrapper (action/action.yml)", () => {
-  it("is a composite action named dpdp-cookie-scan", () => {
-    expect(action.name).toBe("dpdp-cookie-scan");
+  it("is a composite action named dpdp", () => {
+    expect(action.name).toBe("dpdp");
     expect(action.runs.using).toBe("composite");
     expect(action.inputs.url?.required).toBe(true);
     expect(action.outputs["json-path"]).toBeDefined();
@@ -23,7 +23,8 @@ describe("GitHub Action wrapper (action/action.yml)", () => {
   });
 
   it("delegates scanning to the CLI in --ci mode", () => {
-    expect(actionText).toContain("dpdp-cookie-scan");
+    expect(actionText).toContain("dpdp-compliance-scanner");
+    expect(actionText).toContain("dpdp scan page");
     expect(actionText).toContain("--ci");
     expect(actionText).toContain("findings.json");
     expect(actionText).toContain("--fail-on");

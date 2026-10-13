@@ -1,13 +1,11 @@
 {
-  "name": "dpdp-cookie-scanner",
-  "version": "0.5.2",
+  "name": "dpdp-compliance-scanner",
+  "version": "1.0.0",
   "description": "Scans a web page for tracking and data collection, and maps each observation to the provisions of India's DPDP Act 2023 and Rules 2025 it engages — reporting legal certainty, not severity.",
   "license": "Apache-2.0",
   "type": "module",
   "bin": {
-    "dpdp-cookie-scanner": "./dist/cli.js",
-    "dpdp-cookie-scan": "./dist/cli.js",
-    "dpdp-notice-lint": "./dist/notice-cli.js"
+    "dpdp": "./dist/cli.js"
   },
   "main": "./dist/index.js",
   "exports": {

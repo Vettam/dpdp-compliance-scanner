@@ -1,4 +1,4 @@
-dpdp-cookie-scan  staging.acme.in     interpretation as of 2026-09-15
+dpdp  staging.acme.in     interpretation as of 2026-09-15
 
 How sure the law is
   settled    The Act or Rules are clear. Applying them needs no interpretation.
@@ -39,9 +39,9 @@ QUESTIONS ON THE LAW (2)
 
 2 third parties · 2 outside India · 2 fired before the banner
 Rationale for each rule: https://sentinel.vettam.ai/rules/<id>
-Notice content checks: run dpdp-notice-lint against your published notice.
+Notice content checks: run dpdp notice lint against your published notice.
 Save this report as a markdown file by running:
-  dpdp-cookie-scan https://staging.acme.in --md
+  dpdp scan page https://staging.acme.in --md
 That creates ./dpdp-scan/findings.md in the folder where you run the command.
 
 Indicative, not legal advice. Not a compliance verdict.

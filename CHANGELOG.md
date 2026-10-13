@@ -1,4 +1,4 @@
-# dpdp-cookie-scanner
+# dpdp-compliance-scanner
 
 ## 0.5.2
 

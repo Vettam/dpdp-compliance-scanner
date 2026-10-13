@@ -1,17 +1,17 @@
 ---
-name: dpdp-cookie-scan
+name: dpdp-scan
 description: >-
   Scan a web page for tracking and data collection and map each observation to
   the provisions of India's DPDP Act 2023 and Rules 2025 it engages, reporting
   legal certainty (settled / arguable / open) rather than severity. Use when the
-  user asks to check a site for DPDP tracking issues, scan cookies for Indian
+  user asks to check this site for DPDP issues, scan cookies for Indian
   compliance, find what fires before consent on a site, audit third-party
   trackers against the DPDP Act, or review a consent banner under DPDP.
 ---
 
-# dpdp-cookie-scan
+# dpdp-scan
 
-This skill runs the `dpdp-cookie-scan` CLI and summarises its JSON output. It
+This skill runs the `dpdp scan page` CLI and summarises its JSON output. It
 contains **no scanning logic** — all interpretation lives in the CLI's rule
 catalogue. If the JSON schema changes, these parsing instructions change in the
 same commit.
@@ -32,7 +32,7 @@ commence 13 May 2027) and an `explainer_url` linking to a versioned rationale pa
 1. Run the scanner, writing JSON to a temp dir (do not print raw JSON to the user):
 
    ```sh
-   npx --package=dpdp-cookie-scanner dpdp-cookie-scan <url> --json --out /tmp/dpdp-scan
+   npx dpdp-compliance-scanner scan page <url> --json --out /tmp/dpdp-scan
    ```
 
    Add `--gpc` if the user wants the Sec-GPC / DPDP-C-050 evaluation. Add
@@ -51,7 +51,7 @@ commence 13 May 2027) and an `explainer_url` linking to a versioned rationale pa
      (`observable: false` or `needs_input`). Present these as questions, not findings.
      DPDP-C-040 is the specified conditional: "If this site is used by people under 18, then…".
    - `banner.notice_url` and `banner.text_excerpt` are the notice-lint hand-off
-     (spec §5.4). If a notice URL was captured, suggest `dpdp-notice-lint`.
+     (spec §5.4). If a notice URL was captured, suggest `dpdp notice lint`.
    - `summary`: `third_parties`, `third_parties_outside_india`, `fired_before_banner`.
    - `interaction` (when `--interact`): `survived_reject`, `cleared_on_reject`,
      `appeared_on_accept`. Treat these as meaningful only when
@@ -61,7 +61,7 @@ commence 13 May 2027) and an `explainer_url` linking to a versioned rationale pa
    To compare two previous scans without recrawling:
 
    ```sh
-   npx --package=dpdp-cookie-scanner dpdp-cookie-scan --diff-from /tmp/a.json --diff-to /tmp/b.json --out /tmp/dpdp-diff
+   npx dpdp-compliance-scanner map diff --diff-from /tmp/a.json --diff-to /tmp/b.json --out /tmp/dpdp-diff
    ```
 
    Read `diff.json`. `site` is inventory/finding drift on the page; `catalogue` is
@@ -86,7 +86,7 @@ commence 13 May 2027) and an `explainer_url` linking to a versioned rationale pa
    To also write the report as a markdown file:
 
    ```sh
-   npx --package=dpdp-cookie-scanner dpdp-cookie-scan <url> --md --out /tmp/dpdp-scan
+   npx dpdp-compliance-scanner scan page <url> --md --out /tmp/dpdp-scan
    ```
 
    That writes `/tmp/dpdp-scan/findings.md`. `--md` and `--json` can be combined.

@@ -15,7 +15,7 @@ export interface TerminalOptions {
   color?: boolean;
 }
 
-const TOOL_NAME = "dpdp-cookie-scan";
+const TOOL_NAME = "dpdp";
 
 export function renderTerminal(sr: ScanResult, opts: TerminalOptions = {}): string {
   const useColor = opts.color ?? true;
@@ -96,7 +96,7 @@ export function renderTerminal(sr: ScanResult, opts: TerminalOptions = {}): stri
     `${sr.summary.third_parties} third parties · ${sr.summary.third_parties_outside_india} outside India · ${sr.summary.fired_before_banner} fired before the banner`,
   );
   lines.push(`Rationale for each rule: https://sentinel.vettam.ai/rules/<id>`);
-  lines.push(`Notice content checks: run dpdp-notice-lint against your published notice.`);
+  lines.push(`Notice content checks: run dpdp notice lint against your published notice.`);
   lines.push(markdownHint(sr.target.url));
   lines.push("");
   lines.push("Indicative, not legal advice. Not a compliance verdict.");

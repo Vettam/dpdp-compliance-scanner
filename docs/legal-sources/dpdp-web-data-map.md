@@ -294,9 +294,9 @@ On this layer the decisive question is **role**. The Act's Fiduciary definition 
 
 ---
 
-## Part 6 — What this means for dpdp-cookie-scan
+## Part 6 — What this means for the scanner
 
-The name is now slightly misleading, because a DPDP-grade scan has to observe everything in Parts 3 L1–L6 that a browser can see, and flag what it can't. Concretely: capture all storage types, not just cookies; record every outbound request by destination domain and country; inspect request payloads for hashed identifiers, click IDs and form values; detect fingerprinting API calls; record what fires *before* any consent interaction (the PRE flag is the single most damning, most demonstrable finding for a free tool); and state plainly that server-side tagging, logs and backend relays are invisible to a crawler and need a questionnaire.
+A cookie-only scan is too narrow for DPDP. The page scanner has to observe everything in Parts 3 L1–L6 that a browser can see, and flag what it can't. Concretely: capture all storage types, including cookies; record every outbound request by destination domain and country; inspect request payloads for hashed identifiers, click IDs and form values; detect fingerprinting API calls; record what fires *before* any consent interaction (the PRE flag is the single most demonstrable finding for a free tool); and state plainly that server-side tagging, logs and backend relays are invisible to a crawler and need a questionnaire.
 
 A classification record in the maintained dataset could look like this:
 
@@ -318,4 +318,4 @@ fires_pre_consent_by_default: true
 withdrawal_mechanism: "stop firing; clear _fbp/_fbc; request deletion via vendor tools"
 ```
 
-The `notice_itemisation` field is the bridge between the two repos: the scanner produces the inventory, and dpdp-notice-lint can check that the published notice itemises each detected item to the Rule 3(b) standard.
+The `notice_itemisation` field is the bridge: the scanner produces the inventory, and `dpdp notice lint` checks that the published notice itemises each detected item to the Rule 3(b) standard.

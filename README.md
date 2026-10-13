@@ -1,4 +1,4 @@
-# dpdp-cookie-scanner
+# dpdp-compliance-scanner
 
 > A scanner that loads a web page in a headless browser, records everything the
 > page collects about a visitor, and maps each observation to the provisions of
@@ -41,20 +41,15 @@ not yet enforceable is still reported; the date is shown beside it.
 
 ## Install / run
 
-The npm **package** is `dpdp-cookie-scanner`. It ships two **commands**:
-`dpdp-cookie-scan` (this scanner) and `dpdp-notice-lint`. `npx` needs both
-names — which package to download, then which command to run:
-
 ```bash
-npx --package=dpdp-cookie-scanner dpdp-cookie-scan <url> [options]
+npx dpdp-compliance-scanner scan page <url> [options]
 ```
 
-Example: `npx --package=dpdp-cookie-scanner dpdp-cookie-scan https://example.com --md`
+Example: `npx dpdp-compliance-scanner scan page https://example.com --md`
 
-`npx dpdp-cookie-scanner <url>` is the same scan (the package name is an alias
-of `dpdp-cookie-scan`). `npx dpdp-cookie-scan` on its own looks for a different
-package and will not work. After `npm install -g dpdp-cookie-scanner`, call
-`dpdp-cookie-scan` and `dpdp-notice-lint` directly.
+One package, one `dpdp` bin. `npx` runs that bin, so the package name is the
+command. The old `dpdp-cookie-scanner` package is a deprecated shim (see
+[`shim/README.md`](shim/README.md)).
 
 Detects an existing system Chrome/Edge and uses it; downloads Chromium only as
 a fallback (with a one-time message). No outbound network calls other than the
@@ -62,6 +57,7 @@ target URL and its subresources — no telemetry, no update checks, no remote
 rule fetching.
 
 ```
+dpdp scan page <url>
   --json                 write findings.json (default in --ci)
   --md                   write findings.md into --out (default ./dpdp-scan)
   --out <dir>            output directory (default ./dpdp-scan)
@@ -75,8 +71,11 @@ rule fetching.
   --browser <path>       use a specific Chrome/Edge/Chromium binary
   --interact             three-pass banner interaction (load, accept-all, reject-all)
   --fail-on settled      opt-in CI gate; never trips on arguable or open findings
-  --diff-from <json>     with --diff-to, compare two ScanResult files (no crawl)
-  --diff-to <json>
+
+dpdp notice lint <url|file> [--scan findings.json] [--json] [--ci]
+dpdp map diff --diff-from <a.json> --diff-to <b.json> [--json] [--ci] [--out <dir>]
+dpdp explain <rule-id>
+dpdp version
 ```
 
 Exit codes: `0` completed scan · `1` `--fail-on settled` and at least one settled finding · `2` usage error · `3` navigation failure.
@@ -85,38 +84,36 @@ Default is still **no** exit code for findings. `--fail-on` accepts only `settle
 ## Notice content checks
 
 The scanner captures the inventory and the consent banner; it does **not**
-check the published notice's text. That is `dpdp-notice-lint` (v0.2), a
-separate command that checks a notice against DPDP **Rule 3** — itemisation of
-each observed tracker (bridged via the tracker dataset's `notice_itemisation`
-field), a withdrawal mechanism (s.6(4)), a grievance officer (Rule 3), and
-English + Hindi text:
+check the published notice's text. `dpdp notice lint` checks a notice against
+DPDP **Rule 3** — itemisation of each observed tracker (bridged via the tracker
+dataset's `notice_itemisation` field), a withdrawal mechanism (s.6(4)), a
+grievance officer (Rule 3), and English + Hindi text:
 
 ```bash
-npx --package=dpdp-cookie-scanner dpdp-notice-lint <notice-url-or-file> [--scan ./dpdp-scan/findings.json] [--json] [--ci]
+npx dpdp-compliance-scanner notice lint <notice-url-or-file> [--scan ./dpdp-scan/findings.json] [--json] [--ci]
 ```
 
-Pass `--scan` a `findings.json` from `dpdp-cookie-scan` to drive per-tracker
+Pass `--scan` a `findings.json` from `dpdp scan page` to drive per-tracker
 itemisation checks against what the scan actually observed.
 
 ## Agent skill
 
-`skill/SKILL.md` is a Cursor/agent skill that runs the CLI and summarises the
-`ScanResult` grouped by certainty — for "check this site for DPDP tracking
-issues" style prompts. It contains no scanning logic; if the JSON schema
+`skills/dpdp-scan/SKILL.md` is a Cursor/agent skill that runs the CLI and
+summarises the `ScanResult` grouped by certainty — for "check this site for
+DPDP issues" style prompts. It contains no scanning logic; if the JSON schema
 changes, the skill's parsing instructions change in the same commit.
 
 ## GitHub Action
 
-`action/` is a composite Action that runs `dpdp-cookie-scan --ci`, uploads
+`action/` is a composite Action that runs `dpdp scan page --ci`, uploads
 `findings.json` and `findings.md` as an artifact, and posts (or updates)
 `findings.md` as a pull-request comment. It does not interpret findings —
 that stays in the CLI. See [`action/README.md`](action/README.md).
 
 ```yaml
-- uses: Vettam/dpdp-cookie-scanner/action@v0.3.0
+- uses: Vettam/dpdp-cookie-scanner/action@v2
   with:
     url: https://staging.example.com
-    version: "0.3.0"
 ```
 
 The job succeeds on a completed scan even when findings exist. Grant
@@ -165,10 +162,11 @@ tool. Choose your own name.
 **Last rule freshness active date:** 30 September 2026.
 
 The rule catalogue was last confirmed against the Gazette text of the Act,
-Rules, corrigendum, and commencement notification on this date. See
-[`docs/legal-sources/`](docs/legal-sources/README.md) for the product spec,
-the provision-by-provision guide, the web-data map, and those PDFs. Release
-history lives in [`CHANGELOG.md`](CHANGELOG.md).
+Rules, corrigendum, and commencement notification on this date. Product shape
+is [`docs/spec-v2.md`](docs/spec-v2.md). The Gazette PDFs, the
+provision-by-provision guide, the web-data map, and the v1 page-scanner spec
+are in [`docs/legal-sources/`](docs/legal-sources/README.md). Release history
+lives in [`CHANGELOG.md`](CHANGELOG.md).
 
 ---
 

@@ -4,9 +4,9 @@ Primary texts of India's Digital Personal Data Protection Act and Rules, plus
 the project's reading of them. These files are the legal grounding for every
 rule in `rules/`.
 
-Where the spec and the web data map disagree on legal content, the web data
-map wins. Where they disagree on product shape, the spec wins. Where any of
-those disagree with a Gazette PDF in this directory, **the Gazette wins**.
+Where a reading in this directory disagrees with a Gazette PDF, **the Gazette wins**.
+
+Product shape is [`docs/spec-v2.md`](../spec-v2.md). [`spec.md`](spec.md) remains the reference for the page scanner's engine, the page-shaped rules, and the `ScanResult` 1.x schema. Where `spec.md` and the web data map disagree on legal content, the web data map wins. Vocabulary is [`CONTEXT.md`](../../CONTEXT.md). Decisions are in [`docs/adr/`](../adr/).
 
 ## Official texts (Gazettes)
 
@@ -28,4 +28,4 @@ rule catalogue (`enforceable_from`) come from this instrument.
 
 - [`dpdp-web-data-map.md`](dpdp-web-data-map.md) — engineering reference mapping web data collection to the Act and Rules. **Primary source for the rule catalogue and tracker categories** (Parts 2–6).
 - [`dpdp-guide.md`](dpdp-guide.md) — provision-by-provision guide to the Act.
-- [`spec.md`](spec.md) — product specification (what to build, not a legal source).
+- [`spec.md`](spec.md) — v1 page-scanner specification (engine, page-shaped rules, `ScanResult` 1.x). Product shape is [`docs/spec-v2.md`](../spec-v2.md).

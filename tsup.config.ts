@@ -4,7 +4,6 @@ export default defineConfig({
   entry: {
     index: "src/index.ts",
     cli: "src/cli/index.ts",
-    "notice-cli": "src/notice-lint/cli.ts",
   },
   format: ["esm"],
   target: "node20",

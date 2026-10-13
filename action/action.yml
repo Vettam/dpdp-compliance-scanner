@@ -1,5 +1,5 @@
-name: dpdp-cookie-scan
-description: Scan a URL with dpdp-cookie-scan --ci, upload findings.json, and post findings.md on the PR.
+name: dpdp
+description: Scan a URL with dpdp scan page --ci, upload findings.json, and post findings.md on the PR.
 author: Rylematic Technologies Private Limited
 branding:
   icon: shield
@@ -68,7 +68,7 @@ runs:
     - uses: browser-actions/setup-chrome@v1
       id: chrome
 
-    - name: Run dpdp-cookie-scan --ci
+    - name: Run dpdp scan page --ci
       id: scan
       shell: bash
       env:
@@ -84,16 +84,16 @@ runs:
         SCAN_OUT: "${{ inputs.out }}"
       run: |
         set -euo pipefail
-        PKG="dpdp-cookie-scanner"
+        PKG="dpdp-compliance-scanner"
         if [ -n "$SCAN_VERSION" ]; then
-          PKG="dpdp-cookie-scanner@${SCAN_VERSION}"
+          PKG="dpdp-compliance-scanner@${SCAN_VERSION}"
         fi
         EXTRA=()
         if [ "$SCAN_GPC" = "true" ]; then EXTRA+=(--gpc); fi
         if [ "$SCAN_QUERY" = "true" ]; then EXTRA+=(--include-query); fi
         if [ "$SCAN_INTERACT" = "true" ]; then EXTRA+=(--interact); fi
         if [ -n "$SCAN_FAIL_ON" ]; then EXTRA+=(--fail-on "$SCAN_FAIL_ON"); fi
-        npx --yes --package="$PKG" dpdp-cookie-scan "$SCAN_URL" --ci --out "$SCAN_OUT" \
+        npx --yes --package="$PKG" dpdp scan page "$SCAN_URL" --ci --out "$SCAN_OUT" \
           --timeout "$SCAN_TIMEOUT" --settle "$SCAN_SETTLE" --browser "$CHROME_PATH" \
           ${EXTRA[@]+"${EXTRA[@]}"}
         echo "json-path=${SCAN_OUT}/findings.json" >> "$GITHUB_OUTPUT"
@@ -127,7 +127,7 @@ runs:
           }
           const body = [
             marker,
-            `Scanned ${process.env.SCAN_URL} with \`dpdp-cookie-scan --ci\`.`,
+            `Scanned ${process.env.SCAN_URL} with \`dpdp scan page --ci\`.`,
             '',
             report,
           ].join('\n');

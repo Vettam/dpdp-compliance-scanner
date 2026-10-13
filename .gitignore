@@ -4,6 +4,8 @@ dist/
 coverage/
 .dpdp-scan/
 dpdp-scan/
+!skills/dpdp-scan/
+!skills/dpdp-scan/**
 out/
 .env
 .env.local

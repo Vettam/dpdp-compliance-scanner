@@ -1,11 +1,11 @@
 # dpdp-cookie-scan — Product Specification
 
-**Status:** v0.1 spec, ready for implementation
+**Status:** v0.1–v1.0 spec, implemented. Superseded for product shape by [`docs/spec-v2.md`](../spec-v2.md); remains the reference for page-scanner engine behaviour (§4), the page-shaped rule tranche (§5.3), and the `ScanResult` 1.x schema (§7).
 **Date:** 15 September 2026
 **Owner:** Vettam (Rylematic Technologies Private Limited), Sentinel product line
-**Repo:** `dpdp-cookie-scan` (open source)
+**Repo:** `dpdp-compliance-scanner` (open source). Command names in the body below are the v1 names this spec was written against (`dpdp-cookie-scan`, `dpdp-notice-lint`).
 
-This document is the authoritative product spec for a fresh coding session. Coding conventions, linting, and CI rules for the repo are defined separately; this document defines *what* to build, *why*, and the order in which to build it.
+This document is no longer the product-shape spec. Build product shape from [`docs/spec-v2.md`](../spec-v2.md). This document remains the reference for the page scanner's engine (§4), the page-shaped rule tranche (§5.3), and the `ScanResult` 1.x schema (§7). Coding conventions and CI rules live in `CONTRIBUTING.md`.
 
 ---
 

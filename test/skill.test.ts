@@ -2,12 +2,12 @@ import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
-const skillPath = join(process.cwd(), "skill", "SKILL.md");
+const skillPath = join(process.cwd(), "skills", "dpdp-scan", "SKILL.md");
 const skill = readFileSync(skillPath, "utf8");
 
-describe("skill/SKILL.md", () => {
+describe("skills/dpdp-scan/SKILL.md", () => {
   it("has frontmatter with name and description", () => {
-    expect(skill).toMatch(/^---\nname: dpdp-cookie-scan\n/);
+    expect(skill).toMatch(/^---\nname: dpdp-scan\n/);
     expect(skill).toContain("description:");
   });
 
@@ -31,7 +31,7 @@ describe("skill/SKILL.md", () => {
   });
 
   it("instructs the agent to run the CLI and read findings.json", () => {
-    expect(skill).toContain("npx --package=dpdp-cookie-scanner dpdp-cookie-scan");
+    expect(skill).toContain("npx dpdp-compliance-scanner scan page");
     expect(skill).toContain("findings.json");
   });
 

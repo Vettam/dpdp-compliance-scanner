@@ -1,4 +1,4 @@
-# dpdp-cookie-scan — staging.acme.in
+# dpdp — staging.acme.in
 
 > Interpretation as of 2026-09-15. Indicative, not legal advice. Not a compliance verdict.
 
@@ -180,4 +180,4 @@ Subjective or unobservable questions to keep for later. These are not findings.
 - Consent-banner interaction was not performed; findings reflect the page state before any user action.
 - This is a reading of the DPDP Act and Rules, not legal advice and not a compliance verdict.
 
-Notice content checks: run dpdp-notice-lint against your published notice.
+Notice content checks: run dpdp notice lint against your published notice.
