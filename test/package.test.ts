@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync, readdirSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const pkg = JSON.parse(
@@ -35,11 +35,8 @@ describe("npx install contract", () => {
     expect(skill).toContain(NPX_SCAN);
   });
 
-  it("has a major changeset so the first publish is 2.0.0", () => {
-    expect(pkg.version).toBe("1.0.0");
-    const notes = readdirSync(join(process.cwd(), ".changeset"))
-      .filter((name) => name.endsWith(".md") && name !== "README.md")
-      .map((name) => readFileSync(join(process.cwd(), ".changeset", name), "utf8"));
-    expect(notes.join("\n")).toMatch(/"dpdp-compliance-scanner": major/);
+  it("is version 2.0.0 or newer", () => {
+    const major = Number(pkg.version.split(".")[0]);
+    expect(major).toBeGreaterThanOrEqual(2);
   });
 });
