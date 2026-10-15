@@ -1,0 +1,178 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "thin": {
+      "type": "boolean"
+    },
+    "lines": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "purpose": {
+            "type": "string"
+          },
+          "how_long": {
+            "type": "string"
+          },
+          "locations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "recipients": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "vendor": {
+                  "type": "string"
+                },
+                "vendor_name": {
+                  "type": "string"
+                },
+                "role": {
+                  "type": "string"
+                },
+                "notice_itemisation": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "vendor",
+                "vendor_name",
+                "role",
+                "notice_itemisation"
+              ],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "purpose",
+          "how_long",
+          "locations",
+          "recipients"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "data_point": {
+            "type": "string"
+          },
+          "rule_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "ask": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "rule_id",
+          "ask"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "catalogue_questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "rule_id": {
+            "type": "string"
+          },
+          "prompt": {
+            "type": "string"
+          },
+          "needs_input": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "rule_id",
+          "prompt",
+          "needs_input"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "basis_findings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "rule_id": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "provisions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "certainty": {
+            "type": "string",
+            "enum": [
+              "settled",
+              "arguable",
+              "open"
+            ]
+          },
+          "explainer_url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "rule_id",
+          "title",
+          "provisions",
+          "certainty",
+          "explainer_url"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "schema_version",
+    "thin",
+    "lines",
+    "questions",
+    "catalogue_questions",
+    "basis_findings"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

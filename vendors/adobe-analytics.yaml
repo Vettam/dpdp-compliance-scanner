@@ -1,0 +1,21 @@
+id: adobe-analytics
+vendor: Adobe
+match:
+  hosts: ["demdex.net", "stats.g.doubleclick.net", "sc.omtrdc.net", "assets.adobedtm.com"]
+  cookies: ["demdex", "dpm", "s_ecid", "s_cc", "s_vi", "mbox"]
+packages:
+  npm: ["@adobe/alloy"]
+data_points: [persistent_browser_id, page_url, event_name, ip_address, user_agent, ecid]
+category: C4
+flags: [3PF, XFER, PRE]
+role: processor_or_3pf
+lawful_basis: consent
+provisions: ["s.6(1)", "s.8(2)", "s.11(1)(b)", "s.16"]
+notice_itemisation: >
+  A persistent Experience Cloud identifier, pages visited, events, IP address
+  and browser details, sent to Adobe Analytics for measurement.
+destination_countries: [US]
+fires_pre_consent_by_default: true
+withdrawal_mechanism: "Stop firing; clear demdex/s_ecid cookies."
+last_verified: "2026-09-15"
+provenance: direct observation

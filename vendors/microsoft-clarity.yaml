@@ -1,0 +1,22 @@
+id: microsoft-clarity
+vendor: Microsoft
+match:
+  hosts: ["www.clarity.ms", "clarity.ms"]
+  cookies: ["_clck", "_clsk", "CLARITY"]
+packages:
+  npm: ["@microsoft/clarity"]
+data_points: [persistent_browser_id, mouse_movements, clicks, scroll_depth, dom_snapshot, ip_address]
+category: C5
+flags: [3PF, XFER, KIDS, PRE, SENS, PII-LEAK]
+role: processor_or_3pf
+lawful_basis: consent
+provisions: ["s.6(1)", "s.9(3)", "Rule 6(1)(a)"]
+notice_itemisation: >
+  A persistent identifier, mouse movements, clicks, scroll depth and DOM
+  snapshots, plus your IP address, sent to Microsoft Clarity for session replay
+  and heatmaps.
+destination_countries: [US]
+fires_pre_consent_by_default: true
+withdrawal_mechanism: "Stop firing; clear _clck/_clsk cookies."
+last_verified: "2026-09-15"
+provenance: direct observation

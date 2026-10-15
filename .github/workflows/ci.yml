@@ -27,4 +27,5 @@ jobs:
         run: node node_modules/playwright-core/cli.js install --with-deps chromium
       - run: npm run typecheck
       - run: npm run build
+      - run: npm run build:explainers
       - run: npm test

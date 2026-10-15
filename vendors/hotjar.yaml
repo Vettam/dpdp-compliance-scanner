@@ -1,0 +1,24 @@
+id: hotjar
+vendor: Hotjar
+match:
+  hosts: ["static.hotjar.com", "ws.hotjar.com", "insights.hotjar.com"]
+  cookies: ["_hjSessionUser_*", "_hjSession_*", "_hjAbsoluteSessionInProgress", "_hjFirstSeen", "_hjIncludedInSessionSample_*"]
+  storage_keys: ["hjSessionUser", "hjSession"]
+packages:
+  npm: ["@hotjar/browser"]
+data_points: [persistent_browser_id, mouse_movements, clicks, scroll_depth, keystroke_timing, dom_snapshot, ip_address]
+category: C5
+flags: [3PF, XFER, KIDS, PRE, SENS, PII-LEAK]
+role: processor
+lawful_basis: consent
+provisions: ["s.6(1)", "s.9(3)", "Rule 6(1)(a)"]
+notice_itemisation: >
+  A persistent session identifier, mouse movements, clicks, scroll depth,
+  keystroke timing and DOM snapshots of the page, plus your IP address, sent
+  to Hotjar for session replay and heatmaps. Unmasked capture of passwords or
+  health details is a breach.
+destination_countries: [US, MT]
+fires_pre_consent_by_default: true
+withdrawal_mechanism: "Stop firing; clear _hj* cookies and localStorage; mask sensitive fields by default."
+last_verified: "2026-09-15"
+provenance: direct observation

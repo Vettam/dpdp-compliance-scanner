@@ -1,0 +1,28 @@
+id: segment
+vendor: Twilio Segment
+match:
+  hosts: ["cdn.segment.com", "api.segment.io", "analytics.segment.com"]
+  cookies: ["ajs_anonymous_id", "ajs_user_id", "ajs_group_id"]
+packages:
+  npm: ["@segment/analytics-next", "@segment/analytics-node", "analytics-node"]
+  pypi: ["analytics-python", "segment-analytics-python"]
+  maven: ["com.segment.analytics.java:analytics"]
+  go: ["gopkg.in/segmentio/analytics-go.v3", "github.com/segmentio/analytics-go/v3"]
+  rubygems: ["analytics-ruby"]
+  cocoapods: ["Analytics"]
+  composer: ["segmentio/analytics-php"]
+data_points: [persistent_browser_id, page_url, event_name, ip_address, user_agent, traits]
+category: C9
+flags: [3PF, XFER, PRE]
+role: processor
+lawful_basis: consent
+provisions: ["s.6(1)", "s.8(2)", "s.11(1)(b)", "s.16"]
+notice_itemisation: >
+  A persistent identifier, pages visited, events, IP address and browser
+  details, and any user traits, sent to Segment which fans them out to your
+  configured destinations. Its destinations are your sharing register.
+destination_countries: [US]
+fires_pre_consent_by_default: true
+withdrawal_mechanism: "Stop firing; clear ajs_* cookies; suppress destinations."
+last_verified: "2026-09-15"
+provenance: direct observation

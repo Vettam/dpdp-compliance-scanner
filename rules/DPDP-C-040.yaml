@@ -9,6 +9,7 @@ flags: [KIDS, 3PF]
 categories: [C5, C6]
 owner: counsel
 penalty_band: children
+sources: [page]
 detection:
   match: request
   where:
@@ -42,3 +43,6 @@ changelog:
   - version: "0.4.0"
     date: "2026-09-17"
     note: CLI prompt is the specified conditional ("If this site is used by people under 18, then…") rather than a yes/no question.
+  - version: "0.6.0"
+    date: "2026-10-15"
+    note: Declared sources page. Detection is unchanged.

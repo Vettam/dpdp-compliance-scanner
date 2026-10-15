@@ -1,0 +1,282 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "from": {
+      "type": "object",
+      "properties": {
+        "rules_version": {
+          "type": "string"
+        },
+        "vendors_version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "rules_version",
+        "vendors_version"
+      ],
+      "additionalProperties": false
+    },
+    "to": {
+      "type": "object",
+      "properties": {
+        "rules_version": {
+          "type": "string"
+        },
+        "vendors_version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "rules_version",
+        "vendors_version"
+      ],
+      "additionalProperties": false
+    },
+    "catalogue_changed": {
+      "type": "boolean"
+    },
+    "site": {
+      "type": "object",
+      "properties": {
+        "data_points_added": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string",
+                "default": ""
+              },
+              "category": {
+                "type": "string",
+                "default": ""
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "additionalProperties": false
+          },
+          "default": []
+        },
+        "data_points_removed": {
+          "type": "array",
+          "items": {
+            "$ref": "#/properties/site/properties/data_points_added/items"
+          },
+          "default": []
+        },
+        "recipients_added": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "data_point": {
+                "type": "string"
+              },
+              "vendor": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string",
+                "default": ""
+              },
+              "country": {
+                "type": "string",
+                "default": ""
+              }
+            },
+            "required": [
+              "data_point",
+              "vendor"
+            ],
+            "additionalProperties": false
+          },
+          "default": []
+        },
+        "recipients_removed": {
+          "type": "array",
+          "items": {
+            "$ref": "#/properties/site/properties/recipients_added/items"
+          },
+          "default": []
+        },
+        "consent_gates_added": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "kind"
+            ],
+            "additionalProperties": false
+          },
+          "default": []
+        },
+        "consent_gates_removed": {
+          "type": "array",
+          "items": {
+            "$ref": "#/properties/site/properties/consent_gates_added/items"
+          },
+          "default": []
+        },
+        "retention_signals_added": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "data_point": {
+                "type": "string"
+              },
+              "kind": {
+                "type": "string"
+              },
+              "location": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "data_point",
+              "kind",
+              "location"
+            ],
+            "additionalProperties": false
+          },
+          "default": []
+        },
+        "retention_signals_removed": {
+          "type": "array",
+          "items": {
+            "$ref": "#/properties/site/properties/retention_signals_added/items"
+          },
+          "default": []
+        }
+      },
+      "additionalProperties": false
+    },
+    "catalogue": {
+      "type": "object",
+      "properties": {
+        "findings_added": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "rule_id": {
+                "type": "string"
+              },
+              "tracker_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "host": {
+                "type": "string",
+                "default": ""
+              },
+              "certainty": {
+                "type": "string",
+                "enum": [
+                  "settled",
+                  "arguable",
+                  "open"
+                ]
+              },
+              "title": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "rule_id",
+              "tracker_id",
+              "certainty",
+              "title"
+            ],
+            "additionalProperties": false
+          },
+          "default": []
+        },
+        "findings_removed": {
+          "type": "array",
+          "items": {
+            "$ref": "#/properties/catalogue/properties/findings_added/items"
+          },
+          "default": []
+        },
+        "findings_reclassified": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "rule_id": {
+                "type": "string"
+              },
+              "tracker_id": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "host": {
+                "type": "string",
+                "default": ""
+              },
+              "from_certainty": {
+                "type": "string",
+                "enum": [
+                  "settled",
+                  "arguable",
+                  "open"
+                ]
+              },
+              "to_certainty": {
+                "type": "string",
+                "enum": [
+                  "settled",
+                  "arguable",
+                  "open"
+                ]
+              }
+            },
+            "required": [
+              "rule_id",
+              "tracker_id",
+              "from_certainty",
+              "to_certainty"
+            ],
+            "additionalProperties": false
+          },
+          "default": []
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "from",
+    "to",
+    "catalogue_changed",
+    "site",
+    "catalogue"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

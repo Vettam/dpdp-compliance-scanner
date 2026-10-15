@@ -1,0 +1,28 @@
+id: razorpay
+vendor: Razorpay
+match:
+  hosts: ["checkout.razorpay.com", "api.razorpay.com", "cdn.razorpay.com", "lumberjack.razorpay.com"]
+  cookies: ["__rzp_device_id", "rzp_*"]
+packages:
+  npm: ["razorpay"]
+  pypi: ["razorpay"]
+  maven: ["com.razorpay:razorpay-java"]
+  go: ["github.com/razorpay/razorpay-go"]
+  rubygems: ["razorpay"]
+  composer: ["razorpay/razorpay"]
+data_points: [device_id, card_data, payment_metadata, ip_address, user_agent]
+category: C8
+flags: [3PF, XFER, SENS]
+role: fiduciary
+lawful_basis: s7a
+provisions: ["s.16(2)", "s.8(2)", "s.8(5)", "Rule 6(1)"]
+notice_itemisation: >
+  Card and bank data (sent to Razorpay), a device identifier, payment metadata,
+  IP address and browser details, for processing a payment. RBI payment-data
+  localisation survives under s.16(2) as a law providing a higher degree of
+  restriction.
+destination_countries: [IN]
+fires_pre_consent_by_default: false
+withdrawal_mechanism: "Offload payment to Razorpay; do not retain card data yourself."
+last_verified: "2026-09-15"
+provenance: direct observation

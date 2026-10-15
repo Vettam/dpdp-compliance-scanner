@@ -1,9 +1,11 @@
+import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { loadRules, readRulesVersion } from "./rules/loader.js";
-import { loadTrackers, readTrackersVersion } from "./trackers/loader.js";
+import { bundledVendorsDir, loadTrackers, readTrackersVersion } from "./trackers/loader.js";
 import { TrackerIndex } from "./trackers/matcher.js";
 import { mapScan } from "./mapper/index.js";
+import { emitPageScan, type EmittedScan } from "./map/page.js";
 import { attachInteraction, bannerActionClicked } from "./interaction/compare.js";
 import { cmpSignaturesFromTrackers } from "./engine/banner.js";
 import type { ScanResult } from "./types.js";
@@ -17,6 +19,17 @@ export { renderMarkdown } from "./report/markdown.js";
 export { diffScanResults } from "./diff/index.js";
 export { comparePasses, attachInteraction } from "./interaction/compare.js";
 export type { ScanResult, Finding, Question, Observation, ScanResultDiff, Interaction } from "./types.js";
+export { loadDataMap, saveDataMap } from "./map/io.js";
+export { deriveId } from "./map/ids.js";
+export { mergeScan } from "./map/merge.js";
+export { diffDataMaps } from "./map/diff.js";
+export { mapDataMap, mapDataMap as mapFindings } from "./mapper/data-map.js";
+export type { DataMap, DataMapDiff } from "./map/schema.js";
+export type { EmittedScan };
+export { scanCode } from "./scanners/code/index.js";
+export type { CodeScan, CodeScanOptions } from "./scanners/code/index.js";
+export { noticeInputs, noticeLines, noticeChanges } from "./notice/index.js";
+export type { NoticeInputs, NoticeLine, NoticeChange, NoticeReading } from "./notice/index.js";
 
 export interface ScanRunOptions extends ScanOptions {
   /** Override the engine (tests pass a FixtureEngine). Defaults to the real engine. */
@@ -41,7 +54,7 @@ function defaultRulesDir(): string {
 }
 
 function defaultTrackersDir(): string {
-  return join(dirname(fileURLToPath(import.meta.url)), "..", "trackers");
+  return bundledVendorsDir(import.meta.url);
 }
 
 function engineOptions(options: ScanRunOptions): ScanOptions {
@@ -67,11 +80,24 @@ function passOptions(options: ScanOptions, bannerAction: "accept" | "reject"): S
   return { ...rest, bannerAction };
 }
 
+function readPackage(): { name: string; version: string } {
+  const path = join(dirname(fileURLToPath(import.meta.url)), "..", "package.json");
+  return JSON.parse(readFileSync(path, "utf8")) as { name: string; version: string };
+}
+
 /**
  * The library entry point (spec §3.1): scan(url, options) → ScanResult.
  * Surfaces are thin renderers over this. Never forks logic per surface.
  */
 export async function scan(url: string, options: ScanRunOptions = {}): Promise<ScanResult> {
+  return (await scanPage(url, options)).result;
+}
+
+/** Page scan plus the data-map records it emits. ScanResult itself is unchanged. */
+export async function scanPage(
+  url: string,
+  options: ScanRunOptions = {},
+): Promise<{ result: ScanResult; emitted: EmittedScan }> {
   const engine = options.engine ?? (await import("./engine/playwright.js")).defaultEngine;
   const rulesDir = options.rulesDir ?? defaultRulesDir();
   const trackersDir = options.trackersDir ?? defaultTrackersDir();
@@ -91,14 +117,25 @@ export async function scan(url: string, options: ScanRunOptions = {}): Promise<S
   const opts: ScanOptions = { ...engineOptions(options), cmpSignatures: cmpSignaturesFromTrackers(trackers) };
   const loadObs = await engine.scan(url, options.interact ? withoutBannerAction(opts) : opts);
   const load = mapScan({ observations: loadObs, ...mapped });
-  if (!options.interact) return load;
+  const pkg = readPackage();
+  const emitted = emitPageScan({
+    result: load,
+    observations: loadObs,
+    vendors: trackers,
+    packageName: pkg.name,
+    packageVersion: pkg.version,
+  });
+  if (!options.interact) return { result: load, emitted };
 
   const acceptObs = await engine.scan(url, passOptions(opts, "accept"));
   const rejectObs = await engine.scan(url, passOptions(opts, "reject"));
-  return attachInteraction(
-    load,
-    mapScan({ observations: acceptObs, ...mapped }),
-    mapScan({ observations: rejectObs, ...mapped }),
-    { accept: bannerActionClicked(acceptObs), reject: bannerActionClicked(rejectObs) },
-  );
+  return {
+    result: attachInteraction(
+      load,
+      mapScan({ observations: acceptObs, ...mapped }),
+      mapScan({ observations: rejectObs, ...mapped }),
+      { accept: bannerActionClicked(acceptObs), reject: bannerActionClicked(rejectObs) },
+    ),
+    emitted,
+  };
 }

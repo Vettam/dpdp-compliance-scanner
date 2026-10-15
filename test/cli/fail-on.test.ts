@@ -82,14 +82,22 @@ const settledQuestion: Question = {
 };
 
 describe("parseFailOn", () => {
-  it("accepts only settled (or empty/none)", () => {
+  it("accepts only settled on a page scan", () => {
     expect(parseFailOn("")).toBe("");
     expect(parseFailOn("none")).toBe("");
     expect(parseFailOn("settled")).toBe("settled");
     expect(parseFailOn("SETTLED")).toBe("settled");
+    expect(parseFailOn("unmapped")).toBe("invalid");
     expect(parseFailOn("arguable")).toBe("invalid");
     expect(parseFailOn("open")).toBe("invalid");
     expect(parseFailOn("all")).toBe("invalid");
+  });
+
+  it("accepts unmapped for scan code and map diff", () => {
+    expect(parseFailOn("unmapped", true)).toBe("unmapped");
+    expect(parseFailOn("UNMAPPED", true)).toBe("unmapped");
+    expect(parseFailOn("settled", true)).toBe("settled");
+    expect(parseFailOn("arguable", true)).toBe("invalid");
   });
 });
 

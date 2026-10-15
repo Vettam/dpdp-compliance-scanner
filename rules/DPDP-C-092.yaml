@@ -1,0 +1,41 @@
+id: DPDP-C-092
+title: Consent claimed, no consent record kept
+certainty: settled
+enforceable_from: "2027-05-13"
+observable: true
+provisions:
+  - s.6(10)
+flags: []
+categories: [C10]
+owner: counsel
+sources: [page, code]
+penalty_band: consent_basis
+detection:
+  match: map
+  where:
+    basis: consent
+    category_absent: C10
+needs_input: []
+rationale_plain: >
+  Somewhere in the map, consent is the claimed basis, and the map has no
+  consent record. Section 6(10) requires the fiduciary to prove that notice
+  was given and consent was obtained. Category C10 is that record: consent
+  state, the ledger, withdrawal events. It is not in the map.
+rationale_dev: >
+  Detection: at least one data point has basis consent, and no data point has
+  category C10. The web data map places consent state, the ledger, and
+  withdrawal events in C10, kept so the fiduciary can meet s.6(10). A device
+  cookie is not that proof. The finding is one per map. It says the record the
+  burden of proof needs is absent from the map.
+remediation_summary: >
+  Keep a consent record the map can see: who consented, to which purpose, on
+  which notice, and when they withdrew.
+explainer_url: https://sentinel.vettam.ai/rules/DPDP-C-092
+since: "0.6.0"
+changelog:
+  - version: "0.6.0"
+    date: "2026-10-15"
+    note: >
+      Initial rule. Settled. s.6(10) puts the burden of proving notice and
+      consent on the fiduciary. A consent basis with no C10 point has no
+      record on the map.

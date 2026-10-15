@@ -40,6 +40,7 @@ commence 13 May 2027) and an `explainer_url` linking to a versioned rationale pa
    them that the output may contain sensitive URL parameters. Add `--interact` if
    they want accept-all / reject-all comparison (`interaction` on the ScanResult).
    Do not pass `--fail-on` unless they explicitly want the opt-in CI gate.
+   A page scan accepts only `settled`.
 
 2. Read `/tmp/dpdp-scan/findings.json`. The shape is `ScanResult` (see
    `schema/scanresult.schema.json`). The fields you need:
@@ -51,7 +52,9 @@ commence 13 May 2027) and an `explainer_url` linking to a versioned rationale pa
      (`observable: false` or `needs_input`). Present these as questions, not findings.
      DPDP-C-040 is the specified conditional: "If this site is used by people under 18, then…".
    - `banner.notice_url` and `banner.text_excerpt` are the notice-lint hand-off
-     (spec §5.4). If a notice URL was captured, suggest `dpdp notice lint`.
+     (spec §5.4). If a notice URL was captured, suggest `dpdp notice lint` on
+     that URL. Itemisation comes from `.dpdp/data-map.yaml`. Pass `--scan
+     findings.json` only for the legacy page-inventory check.
    - `summary`: `third_parties`, `third_parties_outside_india`, `fired_before_banner`.
    - `interaction` (when `--interact`): `survived_reject`, `cleared_on_reject`,
      `appeared_on_accept`. Treat these as meaningful only when

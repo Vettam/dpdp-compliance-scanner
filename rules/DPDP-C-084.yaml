@@ -1,0 +1,44 @@
+id: DPDP-C-084
+title: No grievance contact observable
+certainty: arguable
+enforceable_from: "2027-05-13"
+observable: true
+provisions:
+  - s.13
+  - Rule 9
+flags: []
+categories: []
+owner: counsel
+sources: [code]
+penalty_band: rights
+detection:
+  match: map
+  where:
+    mentions_grievance: false
+    source_kind: code
+needs_input:
+  - grievance_contact
+prompt: "Where is the grievance contact published? Notice lint checks the notice; this scan cannot see it."
+rationale_plain: >
+  Section 13 gives a person the right to grievance redressal, and Rule 9
+  requires the business contact of the Data Protection Officer, or of a person
+  who can answer questions about the processing, to be published. No consent
+  gate in this map mentions a grievance contact. The notice is where that
+  contact usually lives, and this scan does not read the notice.
+rationale_dev: >
+  Detection: a code map that has data points or consent gates, and no gate
+  text matching grievance, DPO, or complain. The rule hands off to notice lint.
+  Competing reading: Rule 9 and section 13 are satisfied by a contact on the
+  website or in the notice, so its absence from a checkbox in the repository
+  is not a contravention. Tier is arguable, and the output is a question.
+remediation_summary: >
+  Publish the grievance contact in the notice. Do not invent one here.
+explainer_url: https://sentinel.vettam.ai/rules/DPDP-C-084
+since: "0.6.0"
+changelog:
+  - version: "0.6.0"
+    date: "2026-10-15"
+    note: >
+      Initial rule. Arguable. s.13 and Rule 9 require a published contact; the
+      notice, not the repository, is the usual place, so a missing gate mention
+      is a question for notice lint.

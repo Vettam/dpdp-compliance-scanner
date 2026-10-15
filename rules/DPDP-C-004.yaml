@@ -10,6 +10,7 @@ flags: []
 categories: []
 owner: engineering
 penalty_band: consent_quality
+sources: [page]
 detection:
   match: banner
   where:
@@ -32,3 +33,6 @@ changelog:
   - version: "0.1.0"
     date: "2026-09-15"
     note: Initial rule.
+  - version: "0.6.0"
+    date: "2026-10-15"
+    note: Declared sources page. Detection is unchanged.

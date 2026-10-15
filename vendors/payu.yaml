@@ -1,0 +1,22 @@
+id: payu
+vendor: PayU
+match:
+  hosts: ["checkout.payu.in", "assets.payu.in", "js.payu.in", "payu.in"]
+  cookies: ["_payu_*", "payu_*"]
+packages:
+  npm: ["payu-websdk", "payu-sdk"]
+data_points: [device_id, card_data, payment_metadata, ip_address, user_agent]
+category: C8
+flags: [3PF, XFER, SENS]
+role: fiduciary
+lawful_basis: s7a
+provisions: ["s.16(2)", "s.8(2)", "s.8(5)", "Rule 6(1)"]
+notice_itemisation: >
+  Card and bank data (sent to PayU), a device identifier, payment metadata,
+  IP address and browser details, for processing a payment. RBI payment-data
+  localisation survives under s.16(2).
+destination_countries: [IN]
+fires_pre_consent_by_default: false
+withdrawal_mechanism: "Offload payment to PayU; do not retain card data yourself."
+last_verified: "2026-09-15"
+provenance: direct observation

@@ -1,0 +1,55 @@
+id: DPDP-C-093
+title: s.7(a) claimed for behavioural, advertising, or derived processing
+certainty: settled
+enforceable_from: "2027-05-13"
+observable: true
+provisions:
+  - s.7(a)
+  - s.6(1)
+flags: []
+categories: [C5, C6, C9]
+owner: counsel
+sources: [page, code]
+penalty_band: consent_basis
+detection:
+  match: data_point
+  where:
+    basis: voluntarily_provided
+    category_in: [C5, C6, C9]
+needs_input: []
+rationale_plain: >
+  The data fiduciary claims that this processing sits on section 7(a): the
+  person voluntarily provided the data for a specified purpose, and has not
+  indicated that she does not consent. Section 7(a) covers that case. It does
+  not cover behavioural analytics, advertising, or derived and linked data.
+  Those need consent under section 6(1), which must be a clear affirmative
+  act. The claim and the Act disagree. The finding does not say the claim is
+  false, and it is not a verdict on the product.
+rationale_dev: >
+  Detection: a data point with basis voluntarily_provided and category C5, C6,
+  or C9. Spec §6.2 names C5 and C6. C9 is included because the web data map
+  places derived, inferred, and linked data outside s.7(a), and a code scan
+  records Segment as C9. A human override to another category (C8 can sit on
+  s.7(a)) stops the match. Act 22 of 2023, s.7(a): "for the specified purpose
+  for which the Data Principal has voluntarily provided her personal data to
+  the Data Fiduciary, and in respect of which she has not indicated to the
+  Data Fiduciary that she does not consent to the use of her personal data."
+  s.6(1): "The consent given by the Data Principal shall be free, specific,
+  informed, unconditional and unambiguous with a clear affirmative action."
+  Tier is settled: the text limits s.7(a) to data the person provided, and
+  these categories are defined as processing that is not that.
+remediation_summary: >
+  Record consent for this processing, or correct the category if the data
+  point is data the person handed over for that specified purpose.
+explainer_url: https://sentinel.vettam.ai/rules/DPDP-C-093
+since: "0.5.0"
+changelog:
+  - version: "0.5.0"
+    date: "2026-10-15"
+    note: >
+      Initial rule. Settled. s.7(a) does not carry C5, C6, or C9. C9 is
+      included so a Segment point recorded as derived data matches when
+      voluntarily_provided is asserted.
+  - version: "0.6.0"
+    date: "2026-10-15"
+    note: Declared sources page and code. Detection is unchanged.

@@ -9,6 +9,7 @@ flags: [PII-LEAK]
 categories: [C4, C6, C9]
 owner: engineering
 penalty_band: consent_notice
+sources: [page]
 detection:
   match: cookie
   where:
@@ -36,3 +37,6 @@ changelog:
   - version: "0.3.0"
     date: "2026-09-17"
     note: Initial rule. Arguable tier; turns on s.2(t) "in relation to".
+  - version: "0.6.0"
+    date: "2026-10-15"
+    note: Declared sources page. Detection is unchanged.

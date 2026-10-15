@@ -1,0 +1,21 @@
+id: moengage
+vendor: MoEngage
+match:
+  hosts: ["cdn.moengage.com", "api.moengage.com", "js.moengage.com", "moengage.com"]
+  cookies: ["moengage_*", "ME_*"]
+packages:
+  npm: ["@moengage/web-sdk"]
+data_points: [persistent_browser_id, page_url, event_name, ip_address, user_agent, push_token]
+category: C9
+flags: [3PF, XFER, KIDS, PRE, SENS]
+role: independent_or_joint_fiduciary
+lawful_basis: consent
+provisions: ["s.6(1)", "s.9(3)", "s.11(1)(b)", "s.16"]
+notice_itemisation: >
+  A persistent identifier, pages visited, events, IP address, browser details
+  and push token, sent to MoEngage for engagement and segmentation.
+destination_countries: [IN, US]
+fires_pre_consent_by_default: true
+withdrawal_mechanism: "Stop firing; clear moengage_* cookies; request deletion via MoEngage."
+last_verified: "2026-09-15"
+provenance: direct observation

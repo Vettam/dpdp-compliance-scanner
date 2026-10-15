@@ -10,6 +10,7 @@ flags: []
 categories: []
 owner: counsel
 penalty_band: none
+sources: [page]
 detection:
   match: meta
   where: {}
@@ -39,3 +40,6 @@ changelog:
   - version: "0.3.0"
     date: "2026-09-17"
     note: Initial rule. Open tier; observable:false standing question — "traffic data" is undefined.
+  - version: "0.6.0"
+    date: "2026-10-15"
+    note: Declared sources page. Detection is unchanged.

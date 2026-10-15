@@ -1,0 +1,456 @@
+{
+  "type": "object",
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "repository": {
+      "type": "string",
+      "default": ""
+    },
+    "generated_by": {
+      "type": "object",
+      "properties": {
+        "package": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "rules_version": {
+          "type": "string"
+        },
+        "vendors_version": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "package",
+        "version",
+        "rules_version",
+        "vendors_version"
+      ],
+      "additionalProperties": false
+    },
+    "scans": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "source": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "page"
+                  },
+                  "url": {
+                    "type": "string"
+                  },
+                  "detail": {
+                    "type": "object",
+                    "additionalProperties": {},
+                    "default": {}
+                  }
+                },
+                "required": [
+                  "kind",
+                  "url"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "kind": {
+                    "type": "string",
+                    "const": "code"
+                  },
+                  "path": {
+                    "type": "string"
+                  },
+                  "commit": {
+                    "type": "string",
+                    "default": ""
+                  }
+                },
+                "required": [
+                  "kind",
+                  "path"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          },
+          "scanned_at": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "source",
+          "scanned_at"
+        ],
+        "additionalProperties": false
+      },
+      "default": []
+    },
+    "data_points": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "default": ""
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "C0",
+              "C1",
+              "C2",
+              "C3",
+              "C4",
+              "C5",
+              "C6",
+              "C7",
+              "C8",
+              "C9",
+              "C10",
+              "UNCLASSIFIED"
+            ],
+            "default": "UNCLASSIFIED"
+          },
+          "flags": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "KIDS",
+                "3PF",
+                "PROC",
+                "XFER",
+                "DEC",
+                "SENS",
+                "FP",
+                "PRE",
+                "PII-LEAK"
+              ]
+            },
+            "default": []
+          },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": []
+          },
+          "observed": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "scan": {
+                  "type": "string"
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "cookie",
+                    "storage_key",
+                    "request",
+                    "api_call",
+                    "embed",
+                    "banner",
+                    "package",
+                    "http_call",
+                    "schema_column",
+                    "input_field",
+                    "consent_gate",
+                    "retention_signal",
+                    "rights_endpoint"
+                  ]
+                },
+                "location": {
+                  "type": "string"
+                },
+                "confidence": {
+                  "type": "string",
+                  "enum": [
+                    "high",
+                    "medium",
+                    "low"
+                  ]
+                },
+                "seq": {
+                  "type": "integer",
+                  "minimum": 0
+                },
+                "detail": {
+                  "type": "object",
+                  "additionalProperties": {},
+                  "default": {}
+                }
+              },
+              "required": [
+                "scan",
+                "kind",
+                "location",
+                "confidence"
+              ],
+              "additionalProperties": false
+            },
+            "default": []
+          },
+          "recipients": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "vendor": {
+                  "type": "string"
+                },
+                "role": {
+                  "type": "string",
+                  "enum": [
+                    "processor",
+                    "fiduciary",
+                    "depends_on_configuration",
+                    "independent_or_joint_fiduciary",
+                    "processor_or_3pf"
+                  ]
+                },
+                "country": {
+                  "type": "string",
+                  "default": ""
+                },
+                "observed": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/properties/data_points/items/properties/observed/items"
+                  },
+                  "default": []
+                }
+              },
+              "required": [
+                "vendor",
+                "role"
+              ],
+              "additionalProperties": false
+            },
+            "default": []
+          },
+          "consent_gate": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
+          },
+          "purpose": {
+            "type": "string",
+            "default": ""
+          },
+          "basis": {
+            "type": "string",
+            "enum": [
+              "consent",
+              "voluntarily_provided",
+              "legal_obligation",
+              "medical_emergency",
+              "employment",
+              "state_function",
+              "unstated"
+            ],
+            "default": "unstated"
+          },
+          "retention": {
+            "type": "object",
+            "properties": {
+              "stated": {
+                "type": "string",
+                "default": ""
+              },
+              "signals": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "kind": {
+                      "type": "string"
+                    },
+                    "location": {
+                      "type": "string"
+                    },
+                    "scan": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "location"
+                  ],
+                  "additionalProperties": false
+                },
+                "default": []
+              }
+            },
+            "additionalProperties": false,
+            "default": {
+              "stated": "",
+              "signals": []
+            }
+          },
+          "answers": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "answered_at": {
+                  "type": "string"
+                },
+                "by": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "answered_at",
+                "by"
+              ],
+              "additionalProperties": false
+            },
+            "default": {}
+          },
+          "notes": {
+            "type": "string",
+            "default": ""
+          },
+          "stale": {
+            "type": "boolean",
+            "default": false
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "additionalProperties": false
+      },
+      "default": []
+    },
+    "consent_gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "banner",
+              "checkbox",
+              "dialog",
+              "code_check"
+            ]
+          },
+          "observed": {
+            "type": "array",
+            "items": {
+              "$ref": "#/properties/data_points/items/properties/observed/items"
+            },
+            "default": []
+          },
+          "text_excerpt": {
+            "type": "string",
+            "default": ""
+          }
+        },
+        "required": [
+          "id",
+          "kind"
+        ],
+        "additionalProperties": false
+      },
+      "default": []
+    },
+    "rights_endpoints": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "right": {
+            "type": "string",
+            "enum": [
+              "access",
+              "erase",
+              "correct"
+            ]
+          },
+          "observed": {
+            "type": "array",
+            "items": {
+              "$ref": "#/properties/data_points/items/properties/observed/items"
+            },
+            "default": []
+          }
+        },
+        "required": [
+          "right"
+        ],
+        "additionalProperties": false
+      },
+      "default": []
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "data_point": {
+            "type": "string"
+          },
+          "rule_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "default": null
+          },
+          "ask": {
+            "type": "string"
+          },
+          "scan": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "ask"
+        ],
+        "additionalProperties": false
+      },
+      "default": []
+    }
+  },
+  "required": [
+    "schema_version",
+    "generated_by"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

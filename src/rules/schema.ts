@@ -6,6 +6,7 @@ import {
   RULE_OWNERS,
   TRACKER_CATEGORIES,
 } from "../taxonomy.js";
+import { TrackerRole } from "../vendors/schema.js";
 
 /**
  * Rule catalogue schema (spec §5.1). One YAML file per rule in rules/.
@@ -22,7 +23,14 @@ const ObservationMatch = z.enum([
   "api_call",
   "embed",
   "meta",
+  "data_point",
+  "recipient",
+  "consent_gate",
+  "map",
 ]);
+
+/** Which scan sources a rule reads (spec §6.1). Page rules stay on the page path. */
+export const RULE_SOURCES = ["page", "code", "database"] as const;
 
 /**
  * Detection conditions. Each key is an optional predicate the mapper evaluates
@@ -56,6 +64,76 @@ export const WhereCondition = z
     api: z.string().optional(),
     embed_kind: z.enum(["iframe", "script", "img", "font"]).optional(),
     sri: z.boolean().optional(),
+    /** Asserted lawful basis on a data point (spec §4.6). */
+    basis: z
+      .enum([
+        "consent",
+        "voluntarily_provided",
+        "legal_obligation",
+        "medical_emergency",
+        "employment",
+        "state_function",
+        "unstated",
+      ])
+      .optional(),
+    /** Data-point categories this rule reads. */
+    category_in: z.array(z.enum(TRACKER_CATEGORIES)).optional(),
+    /** Scan source of the point, recipient, or map being tested. */
+    source_kind: z.enum(RULE_SOURCES).optional(),
+    /** This data point's category, or, on a whole-map rule, some point has it. */
+    category: z.enum(TRACKER_CATEGORIES).optional(),
+    /** No data point in the map has this category. */
+    category_absent: z.enum(TRACKER_CATEGORIES).optional(),
+    /** The point carries at least one of these flags. */
+    flags_any: z.array(z.enum(OVERLAY_FLAGS)).optional(),
+    basis_not: z
+      .enum([
+        "consent",
+        "voluntarily_provided",
+        "legal_obligation",
+        "medical_emergency",
+        "employment",
+        "state_function",
+        "unstated",
+      ])
+      .optional(),
+    consent_gate_present: z.boolean().optional(),
+    consent_gate_kind: z.enum(["banner", "checkbox", "dialog", "code_check"]).optional(),
+    /** True when retention.stated is non-empty. */
+    retention_stated: z.boolean().optional(),
+    /** True when the point has at least one retention signal. */
+    retention_signal_any: z.boolean().optional(),
+    recipient_role: TrackerRole.optional(),
+    /** A named country other than this one. An unknown country does not match. */
+    recipient_country_not: z.string().optional(),
+    rights_endpoint_present: z
+      .object({
+        right: z.enum(["access", "erase", "correct"]),
+        present: z.boolean(),
+      })
+      .strict()
+      .optional(),
+    observation_kind: z
+      .enum([
+        "cookie",
+        "storage_key",
+        "request",
+        "api_call",
+        "embed",
+        "banner",
+        "package",
+        "http_call",
+        "schema_column",
+        "input_field",
+        "consent_gate",
+        "retention_signal",
+        "rights_endpoint",
+      ])
+      .optional(),
+    /** The vendor record's notice_itemisation is non-empty. */
+    notice_itemisation: z.boolean().optional(),
+    /** A consent gate's text mentions a grievance contact. */
+    mentions_grievance: z.boolean().optional(),
   })
   .strict();
 
@@ -80,6 +158,8 @@ export const RuleSchema = z.object({
   flags: z.array(z.enum(OVERLAY_FLAGS)).default([]),
   categories: z.array(z.enum(TRACKER_CATEGORIES)).default([]),
   owner: z.enum(RULE_OWNERS),
+  /** Existing page rules declare [page]. Map rules declare the sources they read. */
+  sources: z.array(z.enum(RULE_SOURCES)).default(["page"]),
   penalty_band: z.string(),
   detection: Detection,
   needs_input: z.array(z.string()).default([]),

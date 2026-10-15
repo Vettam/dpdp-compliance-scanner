@@ -12,6 +12,7 @@ export default defineConfig({
   splitting: false,
   sourcemap: true,
   clean: true,
+  external: ["typescript"],
   banner: {
     js: "#!/usr/bin/env node",
   },

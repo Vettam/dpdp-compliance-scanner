@@ -1,0 +1,22 @@
+id: juspay
+vendor: Juspay
+match:
+  hosts: ["assets.juspay.in", "api.juspay.in", "sandbox.juspay.in", "juspay.in"]
+  cookies: ["juspay_*"]
+packages:
+  pypi: ["juspay"]
+data_points: [device_id, payment_metadata, ip_address, user_agent]
+category: C8
+flags: [3PF, XFER, SENS]
+role: fiduciary
+lawful_basis: s7a
+provisions: ["s.16(2)", "s.8(2)", "s.8(5)", "Rule 6(1)"]
+notice_itemisation: >
+  Payment metadata, a device identifier, IP address and browser details, sent
+  to Juspay to complete a payment. RBI payment-data localisation survives
+  under s.16(2).
+destination_countries: [IN]
+fires_pre_consent_by_default: false
+withdrawal_mechanism: "Offload payment to Juspay; do not retain card data yourself."
+last_verified: "2026-09-17"
+provenance: vendor documentation

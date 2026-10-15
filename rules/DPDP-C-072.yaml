@@ -1,0 +1,51 @@
+id: DPDP-C-072
+title: One-year retention floor may apply
+certainty: arguable
+enforceable_from: "2027-05-13"
+observable: true
+provisions:
+  - Rule 8(3)
+  - Third Schedule
+flags: []
+categories: []
+owner: counsel
+sources: [code]
+penalty_band: retention
+detection:
+  match: map
+  where:
+    observation_kind: schema_column
+    source_kind: code
+needs_input:
+  - fiduciary_class
+prompt: "If this fiduciary is an e-commerce entity with at least 2 crore registered users in India, an online gaming intermediary with at least 50 lakh, or a social media intermediary with at least 2 crore, then…"
+rationale_plain: >
+  Rule 8(3) tells a Data Fiduciary to keep personal data, the traffic data
+  associated with it, and the logs of the processing for at least one year,
+  and then to erase them unless another law requires longer. Rule 8(1) and
+  the Third Schedule set a three-year inactivity period after which the
+  purpose is deemed no longer served, and that period binds only three
+  classes: large e-commerce, online gaming, and social media intermediaries.
+  Which clock applies depends on a fact the scanner cannot see.
+rationale_dev: >
+  Detection: the map has a schema column from a code scan. The question is
+  asked once. Competing readings: Rule 8(3) and its illustrations (an e-book
+  order kept for a year even after account deletion; a processor kept to the
+  same year) read as a floor for every fiduciary. Rule 8(1) and the Third
+  Schedule prescribe three years only for an e-commerce entity with at least
+  2 crore registered users in India, an online gaming intermediary with at
+  least 50 lakh, and a social media intermediary with at least 2 crore. The
+  guide records the interaction of the floor and an erasure demand inside
+  that year as unresolved. Tier is arguable, contingent on fiduciary_class.
+remediation_summary: >
+  If this fiduciary is in one of those three classes, record the Third
+  Schedule clock. In any case, record how the Rule 8(3) one-year floor is met.
+explainer_url: https://sentinel.vettam.ai/rules/DPDP-C-072
+since: "0.6.0"
+changelog:
+  - version: "0.6.0"
+    date: "2026-10-15"
+    note: >
+      Initial rule. Arguable. Rule 8(3) reads as a one-year floor for every
+      fiduciary; the Third Schedule's three-year deeming rule binds only the
+      three notified classes. The class is unobservable, so this is a question.

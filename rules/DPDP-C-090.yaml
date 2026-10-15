@@ -1,0 +1,44 @@
+id: DPDP-C-090
+title: Processor receives personal data; contract not observable
+certainty: settled
+enforceable_from: "2027-05-13"
+observable: true
+provisions:
+  - s.8(2)
+  - Rule 6(1)(f)
+flags: [PROC]
+categories: []
+owner: counsel
+sources: [code]
+penalty_band: processor
+detection:
+  match: recipient
+  where:
+    recipient_role: processor
+    source_kind: code
+needs_input:
+  - processor_contract
+prompt: "Is there a written contract with this processor, including the security obligations in Rule 6(1)(f)?"
+rationale_plain: >
+  Section 8(2) allows a Data Processor to process personal data only under a
+  valid contract. Rule 6(1)(f) requires the security safeguards to be flowed
+  down in that contract. This recipient is recorded as a processor. The
+  contract is not in the repository, so the scanner asks whether it exists.
+rationale_dev: >
+  Detection: a code-observed recipient whose role is processor. A fiduciary
+  does not match; payment aggregators recorded as fiduciaries stay fiduciaries.
+  s.8(2) is a short requirement of a valid contract. Rule 6(1)(f) is the
+  flow-down of the security measures. The law is settled. The contract is the
+  fact the scanner cannot see, so the rule is a question, the same shape as
+  DPDP-C-040. It does not assert that no contract exists.
+remediation_summary: >
+  Keep a written contract with this processor and record that it exists.
+explainer_url: https://sentinel.vettam.ai/rules/DPDP-C-090
+since: "0.6.0"
+changelog:
+  - version: "0.6.0"
+    date: "2026-10-15"
+    note: >
+      Initial rule. Settled law, unobservable contract, so a question. s.8(2)
+      requires a valid contract; Rule 6(1)(f) requires security obligations to
+      flow down. Role processor only.

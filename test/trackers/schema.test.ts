@@ -54,6 +54,15 @@ describe("TrackerSchema", () => {
     expect(r.ok).toBe(false);
   });
 
+  it("accepts package names and depends_on_configuration", () => {
+    const r = validateTracker({
+      ...valid,
+      role: "depends_on_configuration",
+      packages: { npm: ["@segment/analytics-next"], go: ["gopkg.in/segmentio/analytics-go.v3"] },
+    });
+    expect(r.ok).toBe(true);
+  });
+
   it("accepts optional CMP banner selectors on a C10 record", () => {
     const r = validateTracker({
       ...valid,

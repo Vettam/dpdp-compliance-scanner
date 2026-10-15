@@ -1,0 +1,46 @@
+id: DPDP-C-095
+title: Personal data has no stated lawful basis
+certainty: arguable
+enforceable_from: "2027-05-13"
+observable: true
+provisions:
+  - s.7(a)
+  - Rule 3
+flags: []
+categories: []
+owner: counsel
+sources: [code]
+penalty_band: consent_notice
+detection:
+  match: data_point
+  where:
+    basis: unstated
+    source_kind: code
+    category_in: [C1, C2, C3, C4, C5, C6, C7, C8, C9, C10, UNCLASSIFIED]
+needs_input: []
+rationale_plain: >
+  This personal data has no stated basis. DPDP has no "strictly necessary"
+  exemption that would leave the basis blank. The likely basis for data the
+  person handed over is section 7(a), and the notice still has to state the
+  purpose. Whether this point meets that test is contestable until someone
+  records the basis. Category C0 is outside the Act and is not matched.
+rationale_dev: >
+  Detection: a code-observed point with basis unstated and a category other
+  than C0. This is DPDP-C-031 generalised from first-party cookies to the data
+  map (spec §4.6). The page cookie rule is unchanged. Competing reading: once
+  the purpose is documented, s.7(a) may carry data the person provided for
+  that purpose, so an empty basis is not yet a settled breach. Tier is
+  arguable. Setting a basis stops the match; DPDP-C-093 then tests a
+  voluntarily_provided claim on C5, C6, and C9.
+remediation_summary: >
+  Record the basis for this data. If it is section 7(a), state the purpose in
+  the notice and confirm the data was provided for that purpose.
+explainer_url: https://sentinel.vettam.ai/rules/DPDP-C-095
+since: "0.6.0"
+changelog:
+  - version: "0.6.0"
+    date: "2026-10-15"
+    note: >
+      Initial rule. Arguable. Generalises DPDP-C-031 to code-observed points
+      with no stated basis. s.7(a) may carry the point once the purpose is
+      documented, so an empty basis is not settled.

@@ -10,6 +10,7 @@ flags: [3PF]
 categories: [C7]
 owner: engineering
 penalty_band: consent_notice
+sources: [page]
 detection:
   match: request
   where:
@@ -37,3 +38,6 @@ changelog:
   - version: "0.3.0"
     date: "2026-09-17"
     note: Initial rule. Arguable tier; processor contract (s.8(2)) is unobservable.
+  - version: "0.6.0"
+    date: "2026-10-15"
+    note: Declared sources page. Detection is unchanged.

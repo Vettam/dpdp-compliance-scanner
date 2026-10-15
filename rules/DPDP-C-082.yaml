@@ -1,0 +1,41 @@
+id: DPDP-C-082
+title: No way for a person to correct their data
+certainty: arguable
+enforceable_from: "2027-05-13"
+observable: true
+provisions:
+  - s.12(1)
+flags: []
+categories: []
+owner: counsel
+sources: [code]
+penalty_band: rights
+detection:
+  match: map
+  where:
+    rights_endpoint_present:
+      right: correct
+      present: false
+    observation_kind: schema_column
+    source_kind: code
+needs_input: []
+rationale_plain: >
+  Section 12(1) gives a person the right to correction, completion, and
+  updating of her personal data. The repository stores columns of personal
+  data and has no correction route the scanner can see. The right is clear.
+  Whether that route has to appear in this repository is not.
+rationale_dev: >
+  Detection: a code map with a schema column and no rights endpoint whose
+  right is correct. Competing reading: as with DPDP-C-080, the means of making
+  the request may be published under Rule 14 rather than implemented as a
+  route here. Emitted as arguable. s.12(1) is the correction duty.
+remediation_summary: >
+  Provide a way for a person to correct, complete, and update her data.
+explainer_url: https://sentinel.vettam.ai/rules/DPDP-C-082
+since: "0.6.0"
+changelog:
+  - version: "0.6.0"
+    date: "2026-10-15"
+    note: >
+      Initial rule. Arguable. s.12(1) settles the right to correction; a
+      missing endpoint is not settled as a contravention.

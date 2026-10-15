@@ -1,0 +1,43 @@
+id: DPDP-C-083
+title: Recipient list is not derivable for a person
+certainty: settled
+enforceable_from: "2027-05-13"
+observable: true
+provisions:
+  - s.11(1)(b)
+flags: []
+categories: []
+owner: counsel
+sources: [code]
+penalty_band: rights
+detection:
+  match: recipient
+  where:
+    notice_itemisation: false
+    source_kind: code
+needs_input: []
+rationale_plain: >
+  Section 11(1)(b) gives a person the right to the identities of the other
+  Data Fiduciaries and Data Processors her data was shared with, and a
+  description of the data shared. This recipient is in the map, and the vendor
+  record has no itemisation text to give her. The sharing list cannot be
+  produced from the map.
+rationale_dev: >
+  Detection: a code-observed recipient whose vendor record is missing or whose
+  notice_itemisation is empty. s.11(1)(b) requires identities and a description
+  of the shared data. The vendor record is where this catalogue keeps that
+  description. A record that has the text does not match. The section's
+  exception for sharing with a fiduciary legally authorised to obtain the data
+  for prevention or investigation of offences is not something a scan can see,
+  and it does not describe an ordinary processor or vendor.
+remediation_summary: >
+  Add the notice itemisation for this recipient: who they are, and what data is shared.
+explainer_url: https://sentinel.vettam.ai/rules/DPDP-C-083
+since: "0.6.0"
+changelog:
+  - version: "0.6.0"
+    date: "2026-10-15"
+    note: >
+      Initial rule. Settled. s.11(1)(b) requires the identities and a
+      description of shared data. A recipient with no notice_itemisation
+      cannot be itemised from the map.

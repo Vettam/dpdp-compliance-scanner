@@ -1,0 +1,25 @@
+id: amplitude
+vendor: Amplitude
+match:
+  hosts: ["cdn.amplitude.com", "api.amplitude.com", "api2.amplitude.com"]
+  cookies: ["AMP_*", "amplitude_id"]
+  storage_keys: ["AMP_*", "amplitude_id"]
+packages:
+  npm: ["@amplitude/analytics-browser", "@amplitude/analytics-node", "amplitude-js"]
+  pypi: ["amplitude-analytics"]
+  go: ["github.com/amplitude/analytics-go"]
+  cocoapods: ["Amplitude"]
+data_points: [persistent_browser_id, page_url, event_name, ip_address, user_agent, traits]
+category: C4
+flags: [3PF, XFER, PRE]
+role: processor_or_3pf
+lawful_basis: consent
+provisions: ["s.6(1)", "s.8(2)", "s.11(1)(b)", "s.16"]
+notice_itemisation: >
+  A persistent device identifier, pages visited, events, IP address, browser
+  details and user traits, sent to Amplitude for product analytics.
+destination_countries: [US]
+fires_pre_consent_by_default: true
+withdrawal_mechanism: "Stop firing; clear AMP_* cookies and localStorage."
+last_verified: "2026-09-15"
+provenance: direct observation

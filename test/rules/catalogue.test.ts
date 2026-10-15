@@ -48,7 +48,15 @@ describe("shipped rule catalogue", () => {
   });
 
   it("has a VERSION file", () => {
-    expect(readRulesVersion(rulesDir)).toMatch(/^\d+\.\d+\.\d+$/);
+    expect(readRulesVersion(rulesDir)).toBe("0.6.0");
+  });
+
+  it("every rule declares the sources it reads", async () => {
+    const rules = await loadRules(rulesDir);
+    for (const rule of rules) expect(rule.sources.length).toBeGreaterThan(0);
+    expect(rules.find((rule) => rule.id === "DPDP-C-001")?.sources).toEqual(["page"]);
+    expect(rules.find((rule) => rule.id === "DPDP-C-093")?.sources).toEqual(["page", "code"]);
+    expect(rules.find((rule) => rule.id === "DPDP-C-094")?.sources).toEqual(["code"]);
   });
 
   it("rule ids are unique", async () => {

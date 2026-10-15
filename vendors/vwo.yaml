@@ -1,0 +1,22 @@
+id: vwo
+vendor: Wingify (VWO)
+match:
+  hosts: ["dev.visualwebsiteoptimizer.com", "user.vwo.com", "cdn.visualwebsiteoptimizer.com", "vwo.com"]
+  cookies: ["_vwo_*", "_vis_opt_*"]
+packages:
+  npm: ["vwo-node-sdk", "vwo-fme-node-sdk"]
+data_points: [persistent_browser_id, page_url, experiment_id, ip_address, user_agent]
+category: C5
+flags: [3PF, XFER, KIDS, PRE, PII-LEAK]
+role: processor_or_3pf
+lawful_basis: consent
+provisions: ["s.6(1)", "s.9(3)", "s.8(2)", "s.16"]
+notice_itemisation: >
+  A persistent identifier, pages visited, experiment assignment, IP address
+  and browser details, sent to VWO (Wingify) for A/B testing and
+  personalisation.
+destination_countries: [IN, US]
+fires_pre_consent_by_default: true
+withdrawal_mechanism: "Stop firing; clear _vwo_* / _vis_opt_* cookies."
+last_verified: "2026-09-17"
+provenance: vendor documentation

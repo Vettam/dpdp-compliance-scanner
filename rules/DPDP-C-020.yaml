@@ -10,6 +10,7 @@ flags: [XFER]
 categories: []
 owner: counsel
 penalty_band: none
+sources: [page]
 detection:
   match: request
   where:
@@ -40,3 +41,6 @@ changelog:
   - version: "0.3.0"
     date: "2026-09-17"
     note: Initial rule. Open tier; corrective — cross-border is permitted by default under s.16.
+  - version: "0.6.0"
+    date: "2026-10-15"
+    note: Declared sources page. Detection is unchanged.

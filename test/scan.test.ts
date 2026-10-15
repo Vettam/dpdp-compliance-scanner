@@ -48,8 +48,8 @@ describe("scan()", () => {
     expect(sr.target.url).toBe("https://staging.acme.in");
     expect(sr.findings.map((f) => f.rule_id)).toContain("DPDP-C-001");
     expect(sr.questions.map((q) => q.rule_id)).toContain("DPDP-C-040");
-    expect(sr.rules_version).toBe("0.4.0");
-    expect(sr.trackers_version).toBe("0.3.0");
+    expect(sr.rules_version).toBe("0.6.0");
+    expect(sr.trackers_version).toBe("1.0.0");
     expect(sr.engine_version).toBe("1.0.0");
   });
 

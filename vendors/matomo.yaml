@@ -1,0 +1,22 @@
+id: matomo
+vendor: Matomo (self-hosted or Matomo Cloud)
+match:
+  hosts: ["matomo.org", "cdn.matomo.cloud", "in.matomo.cloud"]
+  cookies: ["_pk_id", "_pk_ses", "_pk_ref"]
+packages:
+  npm: ["matomo-tracker"]
+data_points: [persistent_browser_id, page_url, event_name, ip_address, user_agent]
+category: C4
+flags: [3PF, PRE]
+role: processor_or_3pf
+lawful_basis: consent
+provisions: ["s.6(1)", "s.8(2)", "s.11(1)(b)"]
+notice_itemisation: >
+  A persistent visitor identifier, pages visited, events and IP address, sent
+  to Matomo for web analytics. Self-hosting keeps data on your infrastructure
+  but does not by itself supply a lawful basis.
+destination_countries: [EU]
+fires_pre_consent_by_default: false
+withdrawal_mechanism: "Stop firing; clear _pk_* cookies."
+last_verified: "2026-09-15"
+provenance: direct observation
