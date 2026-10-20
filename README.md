@@ -1,75 +1,97 @@
-# dpdp-compliance-scanner
+# DPDP Compliance Scanner
 
-> A scanner that loads a web page in a headless browser, records everything the
-> page collects about a visitor, and maps each observation to the provisions of
-> India's **Digital Personal Data Protection Act 2023** and **DPDP Rules 2025**
-> that it engages — reporting **how settled the law is**, not how severe the
-> tracker is.
+Open-source scanner for India's Digital Personal Data Protection Act, 2023 (DPDP Act) and the DPDP Rules, 2025. It records the personal data a website and a codebase handle, writes that record to a committed **data map**, and maps each item to the provisions it engages. Every finding reports **how settled the law is**, and the date the obligation becomes enforceable.
 
-India has no cookie law. The entire relevance of a cookie scan under DPDP
-rests on an inference chain: a tracker collects data → that data identifies a
-person → processing personal data needs a lawful basis → DPDP's lawful bases
-are a closed list (consent, or s.7) → so most trackers need consent, which
-must be preceded by notice and be a clear affirmative act. Some links in that
-chain are settled, some are arguable, some nobody knows yet. **This tool's job
-is to show you which is which.** That interpretation layer is the product; the
-scanning engine is commodity.
+People look for an India cookie scanner because that is how consent tools are sold. India has no cookie law. A cookie, a database column, a form field, and a log line are the same kind of thing under the Act: an item of personal data. This tool scans all of them.
 
-`dpdp scan page` observes a live page. `dpdp scan code` reads a repository
-and records what it finds on the same committed data map: dependency manifests
-in every ecosystem, and JavaScript, TypeScript, and Python source (outbound
-calls, schema columns, form inputs, consent gates, retention signals, and
-rights endpoints). It does not run the repository or call the network, and it
-does not need a Python interpreter. `dpdp notice inputs` is what the
-`dpdp-notice` skill reads when it drafts a consent notice from that map. The
-skill does not decide the law, and it does not fill the notice in.
+**Law last verified: 20 October 2026.** The rule catalogue (`rules/` 0.6.0) was confirmed on that date against the Gazette text of the Act, the Rules, the corrigendum, and the commencement notification. Copies live in [`docs/legal-sources/`](docs/legal-sources/README.md). Where a reading in this repository disagrees with a Gazette PDF, the Gazette wins.
 
-## The certainty model
+npm package: [`dpdp-compliance-scanner`](https://www.npmjs.com/package/dpdp-compliance-scanner). One command: `dpdp`. Requires Node.js 22 or newer.
 
-Every finding carries a **certainty tier** (interpretive confidence) and an
-**enforceability date** (temporal status). There is no severity field.
+```bash
+npx dpdp-compliance-scanner scan page https://example.com --md
+npx dpdp-compliance-scanner scan code .
+```
+
+The scanner runs in your environment. It does not phone home, fetch rules from a server, or send telemetry. The only network calls in a page scan are the target URL and its subresources.
+
+## What a scan produces
+
+A **data map** at `.dpdp/data-map.yaml`, committed to the repository. Findings, questions, and notice drafts are derived from that file. A single scan is only the recording of one source at one moment.
+
+| Source | Command | What it observes |
+|---|---|---|
+| Live page | `dpdp scan page <url>` | Cookies, storage keys, requests, embeds, fingerprinting API calls, and the consent banner. Uses the system Chrome or Edge, and downloads Chromium only if neither is present. |
+| Codebase | `dpdp scan code [path]` | Dependency manifests in every supported ecosystem, plus JavaScript, TypeScript, and Python source. Reads files. Does not run the repository, call the network, or need a Python interpreter. |
+
+Other languages are read from their manifests only. Go, Java, Kotlin, Swift, Ruby, PHP, Rust, and Dart dependencies are matched; their source is not parsed.
+
+The code scanner records:
+
+- a recipient for each dependency that matches the vendor dataset
+- a data point for each personal-data column and form field
+- a recipient for each outbound call to a known vendor host
+- consent gates, retention signals, and rights endpoints (`access`, `erase`, `correct`)
+- a question when a free-text column or an unmatched outbound-looking dependency cannot be classified
+
+Manifests it reads include `package.json` and lockfiles, `requirements*.txt`, `pyproject.toml`, `poetry.lock`, `Pipfile.lock`, `Gemfile.lock`, `go.mod` / `go.sum`, `pom.xml`, `build.gradle` / `build.gradle.kts`, `Cargo.lock`, `Podfile.lock`, `Package.swift`, `composer.lock`, and `pubspec.lock`.
+
+Each scan rewrites the scanner zone (`observed`, retention `signals`, `questions`) and leaves the human zone in place: `name`, `purpose`, `basis`, `retention.stated`, `answers`, and `notes`. A new data point starts at `basis: unstated`. A data point that later scans no longer see is marked `stale: true`. A machine never deletes it.
+
+## What this repository includes
+
+| Piece | Where | Role |
+|---|---|---|
+| CLI | `src/cli/`, bin `dpdp` | Page scan, code scan, data map, notice inputs, notice lint, rule explainers |
+| Page scanner | `src/engine/` | Headless browser capture, banner detection, redaction, offline IP-to-country |
+| Code scanner | `src/scanners/code/` | Manifests, JS/TS (TypeScript compiler API), Python (built-in tokenizer) |
+| Data map | `src/map/`, `.dpdp/data-map.yaml` | Merge of every scan of one repository, with stable ids |
+| Mapper | `src/mapper/` | Applies `rules/*.yaml` to the data map. Scanners record facts; the mapper interprets them |
+| Rule catalogue | `rules/` (version 0.6.0) | 35 rules, each with a certainty tier, an enforceability date, and a rationale |
+| Vendor dataset | `vendors/` (version 1.0.0) | Hosts, packages, and signatures for third parties, including Indian payment, marketing, and support vendors |
+| Notice tools | `src/notice/`, `src/notice-lint/` | Itemisation inputs, change classification, and a check of a published notice against Rule 3 |
+| Agent skills | `skills/dpdp-scan`, `skills/dpdp-map`, `skills/dpdp-notice` | Run the CLI and reason over its JSON. They contain no scanning logic and no legal logic |
+| GitHub Action | `action/` | Page scan, code scan, map diff, and a pull-request comment |
+| Explainer JSON | `npm run build:explainers` | One JSON file per rule for the [Sentinel](https://sentinel.vettam.ai) site. The rendered pages are not stored here |
+| Deprecated shim | [`shim/`](shim/README.md) | The old `dpdp-cookie-scanner` package name, forwarding to `dpdp` |
+
+Library entry points, for a host that imports the package: `scan`, `scanCode`, `loadDataMap`, `mergeScan`, `mapFindings`, `diffDataMaps`, `noticeInputs`, `noticeChanges`.
+
+Anything that runs on your machine, in CI, or in your own agent is in this repository. Scheduled re-scans, drift history, merging data maps across repositories, and counsel review of a notice draft are the hosted Sentinel product from Vettam (Rylematic Technologies Private Limited).
+
+## How a finding is read
+
+Every finding carries a **certainty tier** and an **enforceability date**. There is no severity field. The tier is a property of the rule, fixed in `rules/*.yaml`, and the same for every vendor.
 
 | Tier | Meaning |
 |---|---|
-| `settled` | The text of the Act or Rules is clear and its application needs no interpretation. |
-| `arguable` | The provision applies, but its application to this fact pattern is contestable. |
-| `open` | No Board guidance, no case law, the text is silent; resolved by future orders. |
+| `settled` | The text of the Act or Rules is clear, and applying it here needs no interpretation. |
+| `arguable` | The provision applies, and applying it to this fact pattern is contestable. |
+| `open` | The text is silent or undefined. No Board guidance and no case law yet. |
 
-Most substantive obligations commence **13 May 2027**. A finding whose rule is
-not yet enforceable is still reported; the date is shown beside it.
+Most substantive obligations commence **13 May 2027** (G.S.R. 843(E), 13 November 2025). A finding whose rule is not yet in force is still reported, with that date beside it.
 
-## What it is — and is not
+A finding is one rule applied to one or more data points: what was observed, which provisions it engages, how certain that reading is, and from when it is enforceable. Compliance is a judgement for counsel. The full model is [`docs/certainty-model.md`](docs/certainty-model.md).
 
-- **Not an enforcement gate by default.** A completed scan exits 0. The only
-  opt-in exits are `--fail-on settled` and `--fail-on unmapped` (see CI below).
-- **Not a consent manager.** It does not fix anything.
-- **Not a finished notice.** The notice skill drafts from the data map and
-  leaves withdrawal, grievance, a Board complaint, and Hindi blank.
-- **Not a compliance verdict.** It never says a site "is" or "is not"
-  compliant. That judgement, with counsel review, is the paid Sentinel product.
-- **Not an executor.** `dpdp scan code` reads manifests and JavaScript,
-  TypeScript, or Python source. It does not run that code. Other languages
-  are read from their manifests only.
+Categories `C0`–`C10` classify a data point by purpose and lawful basis (service delivery, security, measurement, behavioural analytics, advertising, identity data, and the consent record, among others). They are defined in [`docs/legal-sources/dpdp-web-data-map.md`](docs/legal-sources/dpdp-web-data-map.md).
 
-## Install / run
+Before a basis is recorded, `dpdp map show` reports **DPDP-C-095** (arguable) on each personal-data point with no basis, and **DPDP-C-094** (open) for a recipient outside India. Transfer is permitted unless the destination is restricted. **DPDP-C-080** and **DPDP-C-082** (arguable) fire when stored columns have no access or correction route. An erasure route satisfies **DPDP-C-081**.
+
+Questions, rather than findings, ask for a retention period (**DPDP-C-070**), whether Rule 8(3) and the Third Schedule apply (**DPDP-C-072**), and whether a written contract exists for a processor (**DPDP-C-090**). Razorpay stays a fiduciary, so C-090 does not apply to it.
+
+After a basis is recorded, the mapper tests the claim. Voluntarily provided on `C5`, `C6`, or `C9` is **DPDP-C-093**. Consent with no linked gate is **DPDP-C-091**. Consent with no `C10` consent record in the map is **DPDP-C-092**. A consent basis linked to a code gate with no reject control is **DPDP-C-004**. A pre-ticked gate is **DPDP-C-005**. The finding says the claim and the Act disagree. It does not say the claim is false.
+
+`dpdp explain DPDP-C-001` prints the rule. The last line is `https://sentinel.vettam.ai/rules/<id>`.
+
+## How to use it
+
+### Scan a website for DPDP issues
 
 ```bash
-npx dpdp-compliance-scanner scan page <url> [options]
+npx dpdp-compliance-scanner scan page https://example.com --md
 ```
 
-Example: `npx dpdp-compliance-scanner scan page https://example.com --md`
-
-One package, one `dpdp` bin. `npx` runs that bin, so the package name is the
-command. The old `dpdp-cookie-scanner` package is a deprecated shim (see
-[`shim/README.md`](shim/README.md)).
-
-`dpdp scan page` also writes `.dpdp/data-map.yaml` (the committed data map)
-unless `--no-map` is set. `dpdp map show` reads that file.
-
-Detects an existing system Chrome/Edge and uses it; downloads Chromium only as
-a fallback (with a one-time message). No outbound network calls other than the
-target URL and its subresources — no telemetry, no update checks, no remote
-rule fetching.
+Findings land in `./dpdp-scan/` (`findings.md`, and `findings.json` when you pass `--json` or `--ci`). The same command writes `.dpdp/data-map.yaml` unless you pass `--no-map`.
 
 ```
 dpdp scan page <url>
@@ -83,67 +105,64 @@ dpdp scan page <url>
   --timeout <ms>         navigation timeout (default 15000)
   --settle <ms>          post-load settle wait (default 3000)
   --rules-version        print catalogue version and exit
-  --browser <path>       use a specific Chrome/Edge/Chromium binary
+  --browser <path>       use a specific Chrome, Edge, or Chromium binary
   --interact             three-pass banner interaction (load, accept-all, reject-all)
-  --fail-on settled      opt-in CI gate; never trips on arguable or open findings
+  --fail-on settled      opt-in CI gate; arguable and open findings do not trip it
   --no-map               do not write .dpdp/data-map.yaml
-
-dpdp scan code [path] [--json] [--md] [--out <dir>] [--ci] [--fail-on settled|unmapped] [--no-map]
-
-dpdp notice inputs [--map <file>] [--json]
-dpdp notice changes --from <ref|file> --to <ref|file> [--json]
-dpdp notice lint <url|file> [--scan findings.json] [--json] [--ci]
-dpdp map init              # create .dpdp/data-map.yaml
-dpdp map show [--json]     # data points, findings, and open questions
-dpdp map questions [--json]
-dpdp map diff --from <ref|file> --to <ref|file> [--md] [--ci] [--fail-on settled|unmapped] [--out <dir>]
-dpdp map diff --diff-from <a.json> --diff-to <b.json> [--json] [--ci] [--out <dir>]
-dpdp explain <rule-id>     # last line is https://sentinel.vettam.ai/rules/<id>
-dpdp version               # package, rules/VERSION, vendors/VERSION
 ```
 
-`dpdp scan code` writes that repository into the same data map. A matched dependency becomes a recipient (`kind: package`). JavaScript, TypeScript, and Python add a data point per personal-data column and form field, a recipient per outbound call to a known vendor, consent gates, retention signals on the columns they belong to, and rights endpoints (`access`, `erase`, `correct`) on the map. A free-text column the vocabulary does not recognise becomes a question. It does not run the code or call the network. Python is tokenized in this package; a scan does not need a Python interpreter installed.
+`--interact` loads the page three times: once as a visitor who does nothing, once after accept-all, and once after reject-all. The report shows which trackers still fire after reject.
 
-A scan rewrites the scanner zone (`observed`, retention `signals`, `questions`) and leaves the human zone in place. A new data point starts at `basis: unstated`. Purpose, basis, category, `retention.stated`, notes, and `answers` are written by a person, or by the `dpdp-map` skill after they confirm the words. `dpdp map show` applies the catalogue (rules `0.6.0`) to that map.
+### Scan a codebase and build the data map
 
-Before a basis is set, a code map reports **DPDP-C-095** (arguable) on each personal-data point with no basis, **DPDP-C-094** (open) for a recipient outside India — transfer is permitted unless the destination is restricted — and **DPDP-C-080** / **DPDP-C-082** (arguable) when stored columns have no access or correction route. An erasure route satisfies **DPDP-C-081**. Questions, not findings, ask for a retention period (**DPDP-C-070**), whether Rule 8(3) and the Third Schedule apply (**DPDP-C-072**), and whether a written contract exists for a processor (**DPDP-C-090**). Razorpay stays a fiduciary, so C-090 does not apply to it.
-
-After a basis is recorded, show tests the claim. Voluntarily provided on `C5`, `C6`, or `C9` is **DPDP-C-093**. Consent with no linked gate is **DPDP-C-091**. Consent with no `C10` consent record in the map is **DPDP-C-092**. A consent basis linked to a code gate with no reject control is **DPDP-C-004**; a pre-ticked gate is **DPDP-C-005**. The finding says the claim and the Act disagree. It does not say the claim is false.
-
-## CI
-
-Exit codes: `0` completed · `1` an opt-in gate tripped · `2` usage error · `3` navigation failure or unreadable repository.
-
-| Gate | Commands | Trips when |
-|---|---|---|
-| `--fail-on settled` | `scan page`, `scan code` | The scan has a settled finding. Arguable findings, open findings, and questions do not trip it. |
-| `--fail-on unmapped` | `scan code`, `map diff` | The later map has a data point, recipient, consent gate, or retention signal the earlier map does not account for. Removals do not trip it. |
-
-Catalogue drift is a change in findings because `rules_version` or `vendors_version` changed. It does not fail a build. `dpdp map diff --from <git-ref> --to <git-ref>` reads `.dpdp/data-map.yaml` from those commits. A path that exists on disk is read as a file.
+From the repository root:
 
 ```bash
-npx dpdp-compliance-scanner scan code --ci --fail-on unmapped
-npx dpdp-compliance-scanner map diff --from origin/main --to HEAD --ci
+npx dpdp-compliance-scanner scan code . --md
+npx dpdp-compliance-scanner map show
+npx dpdp-compliance-scanner map questions
 ```
 
-The scan exits 1 until you commit the map it wrote. After that commit, the same scan exits 0. The diff prints site drift and catalogue drift separately.
+`dpdp map init` creates an empty `.dpdp/data-map.yaml` when you want the file before the first scan. `dpdp map show` applies catalogue 0.6.0 and prints data points, findings, and open questions. `dpdp map questions` prints only the questions.
 
-## Notice
+Purpose, category, basis, and retention are written by a person, or by the `dpdp-map` skill after that person confirms the words. The scanner proposes a category and a name. It leaves `basis` as `unstated`.
 
-The scanner records the inventory. It does not write the notice, and it does
-not check the published text while scanning.
+```
+dpdp scan code [path]
+  --json
+  --md
+  --out <dir>                 default ./dpdp-scan
+  --ci
+  --fail-on settled|unmapped
+  --no-map
 
-`dpdp notice inputs` prints one line per data point: what (`name`), why
-(`purpose`), who (the vendor's `notice_itemisation`), and how long
-(`retention.stated`). `dpdp notice changes` compares two maps, or a map file
-with the map at a git ref, and reports whether any purpose is new. A purpose
-is new when the later map uses a purpose string the earlier map does not. A
-new recipient, or a new data point that reuses a purpose, does not ask for
-fresh consent.
+dpdp map init
+dpdp map show [--json]
+dpdp map questions [--json]
+dpdp map diff --from <ref-or-file> --to <ref-or-file> [--md] [--ci] [--fail-on settled|unmapped] [--out <dir>]
+dpdp map diff --diff-from <a.json> --diff-to <b.json> [--json] [--ci] [--out <dir>]
+```
 
-The `dpdp-notice` skill turns that JSON into a draft and a cover sheet for
-counsel. The draft itemises only data points on the map. These four spans stay
-blank, and a person fills them before publication:
+`dpdp map diff --from origin/main --to HEAD` reads `.dpdp/data-map.yaml` from those commits. A path that exists on disk is read as a file. The report separates **site drift** (data points, recipients, consent gates, and retention signals added or removed) from **catalogue drift** (findings that changed because `rules_version` or `vendors_version` changed). Catalogue drift does not fail a build.
+
+`--diff-from` / `--diff-to` compare two page-scan `ScanResult` JSON files, the older interpretation diff.
+
+### Draft and check a DPDP consent notice
+
+The scanner records the inventory. Drafting is a separate step, and a published notice is checked only when you lint it.
+
+```bash
+npx dpdp-compliance-scanner notice inputs --json
+npx dpdp-compliance-scanner notice changes --from origin/main --to HEAD --json
+npx dpdp-compliance-scanner notice lint ./notice.md --json
+npx dpdp-compliance-scanner notice lint https://example.com/privacy
+```
+
+`dpdp notice inputs` prints one line per data point: what (`name`), why (`purpose`), who (the vendor's `notice_itemisation`), and how long (`retention.stated`). Pass `--map <file>` when the map is not `.dpdp/data-map.yaml`.
+
+`dpdp notice changes` compares two maps, or a map file with the map at a git ref. A purpose is new when the later map uses a purpose string the earlier map does not. A new purpose is what asks for fresh consent. A new recipient, or a new data point that reuses a purpose, does not.
+
+The `dpdp-notice` skill turns that JSON into a draft and a cover sheet for counsel. The draft itemises only data points on the map. These four spans stay blank, and a person fills them before publication:
 
 ```
 [BLANK: withdrawal mechanism]
@@ -152,92 +171,95 @@ blank, and a person fills them before publication:
 [BLANK: Hindi]
 ```
 
-`dpdp notice lint` checks a published notice against `.dpdp/data-map.yaml` and
-DPDP Rule 3: each data point itemised, each recipient named, a withdrawal
-mechanism (s.6(4)), a grievance contact, how to complain to the Board (Rule
-3(c)), and English plus an Eighth Schedule language. A `[BLANK: …]` span does
-not pass those checks. Lint the notice, not the cover sheet. The command exits
-0 when it finishes; a failed check is listed in the output. `--scan
-findings.json` still itemises the page-scan inventory, for one release, and
-does not read the map.
+`dpdp notice lint` checks a published notice against `.dpdp/data-map.yaml` and DPDP Rule 3: each data point itemised, each recipient named, a withdrawal mechanism (s.6(4)), a grievance contact, how to complain to the Board (Rule 3(c)), and English plus an Eighth Schedule language. A `[BLANK: …]` span does not pass those checks. Lint the notice, not the cover sheet. The command exits 0 when it finishes; a failed check is listed in the output. `--scan findings.json` still itemises a page-scan inventory, for one release, and does not read the map. Default output directory for lint JSON is `./notice-lint-out`.
+
+### Versions
 
 ```bash
-npx dpdp-compliance-scanner notice inputs --json
-npx dpdp-compliance-scanner notice changes --from origin/main --to HEAD --json
-npx dpdp-compliance-scanner notice lint <notice-url-or-file> [--scan ./dpdp-scan/findings.json] [--json] [--ci]
+npx dpdp-compliance-scanner version
+npx dpdp-compliance-scanner explain DPDP-C-002
 ```
 
-## Agent skills
+`dpdp version` prints the package version, `rules/VERSION`, and `vendors/VERSION`.
 
-The skills run the CLI and reason over its JSON. They do not scan and they do
-not apply the catalogue. If a JSON schema changes, that skill's parsing
-instructions change in the same commit.
+### Exit codes
 
-`skills/dpdp-scan/SKILL.md` summarises a page scan grouped by certainty, for
-"check this site for DPDP issues".
+| Code | Meaning |
+|---|---|
+| 0 | The command finished. Findings on their own do not change this. |
+| 1 | An opt-in gate tripped. |
+| 2 | Usage error: missing URL, missing map, unknown rule, bad `--fail-on`. |
+| 3 | The page did not load, or the repository path could not be read. |
 
-`skills/dpdp-map/SKILL.md` is interactive, for "map what my codebase collects"
-or "answer the DPDP questions". It runs `dpdp scan code`, reads
-`dpdp map questions --json`, and asks each question with the observed hint
-(`kind`, `location`, `confidence`). It offers the closed lists for `category`,
-`basis`, and retention wording, proposes a `purpose`, and writes only after
-the developer confirms. Answers go in the human zone: `answers.<question id>`
-holds `answered_at` and `by` (the word `developer`). It then runs
-`dpdp map show --json` and summarises findings by tier, then the catalogue
-questions (retention, fiduciary class, processor contract). A section 7(a)
-claim on behavioural, advertising, or derived data is DPDP-C-093.
+| Gate | Commands | Trips when |
+|---|---|---|
+| `--fail-on settled` | `scan page`, `scan code` | The scan has a settled finding. Arguable findings, open findings, and questions do not trip it. |
+| `--fail-on unmapped` | `scan code`, `map diff` | The later map has a data point, recipient, consent gate, or retention signal the earlier map does not account for. Removals do not trip it. A page scan rejects this value. |
 
-`skills/dpdp-notice/SKILL.md` drafts a consent notice, or a change notice, for
-"draft our consent notice" or "what do we tell customers about this change".
-It reads `dpdp notice inputs --json` and, for a change, `dpdp notice changes`.
-It itemises only data points in the map, leaves withdrawal, grievance, a Board
-complaint, and Hindi as marked blanks, and writes a cover sheet that traces
-each line to a data point. A new purpose asks for fresh consent. A new
-recipient does not. It does not edit the map.
+```bash
+npx dpdp-compliance-scanner scan code --ci --fail-on unmapped
+npx dpdp-compliance-scanner map diff --from origin/main --to HEAD --ci
+```
 
-## GitHub Action
+`scan code --fail-on unmapped` exits 1 until you commit the map the scan wrote. After that commit, the same scan exits 0.
 
-`action/` is a composite Action. It runs `dpdp scan page --ci` when `url` is
-set and `dpdp scan code --ci` when `code: true`, then on a pull request runs
-`dpdp map diff --from <base> --to HEAD`. The artifact holds the findings, the
-data map, and `datamap-diff.json`. The pull-request comment puts that drift
-table above the findings. Interpretation stays in the CLI. See
-[`action/README.md`](action/README.md).
+### GitHub Action
+
+`action/` runs `dpdp scan page --ci` when `url` is set and `dpdp scan code --ci` when `code: true`. On a pull request it then runs `dpdp map diff` against the base commit. The `dpdp-scan` artifact holds the findings, the data map, and `datamap-diff.json`. The pull-request comment puts the drift table above the findings.
+
+Check out with `fetch-depth: 0` so the base commit is available. Grant `pull-requests: write` so the comment can be posted. Pin the Action ref and the npm `version` together.
 
 ```yaml
-- uses: actions/checkout@v4
-  with:
-    fetch-depth: 0
-- uses: Vettam/dpdp-cookie-scanner/action@v2
-  with:
-    url: https://staging.example.com
-    code: true
+name: DPDP scan
+on:
+  pull_request:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: Vettam/dpdp-cookie-scanner/action@v2
+        with:
+          url: https://staging.example.com
+          code: true
+          version: "2.0.0"
+          fail-on: unmapped
 ```
 
-The job succeeds on a completed scan even when findings exist. `fail-on: settled`
-fails on a settled finding. `fail-on: unmapped` fails `dpdp scan code` when the
-scan observed something the committed map does not account for; catalogue drift
-does not fail the job. Grant `pull-requests: write` so the comment can be posted.
+`fail-on: settled` fails the job on a settled finding. `fail-on: unmapped` fails the code scan when the scan observed something the committed map does not account for. Catalogue drift does not fail the job. Inputs, outputs, and the comment format are in [`action/README.md`](action/README.md).
 
-## Architecture
+### Agent skills
 
-One core, many surfaces. The core is the data map plus the mapper. `scan(url, options)`
-still returns a `ScanResult`. `scanCode(path)` reads manifests and JavaScript, TypeScript, and Python.
-The CLI and the agent skills are thin renderers. Scanners record facts; a person asserts purpose and basis; the mapper applies rules.
+The skills run the CLI and reason over its JSON. If a JSON schema changes, that skill's parsing instructions change in the same commit.
 
+| Skill | Use it when you want to | What it runs |
+|---|---|---|
+| [`skills/dpdp-scan`](skills/dpdp-scan/SKILL.md) | Check a site for DPDP issues, see what fires before consent, or review a consent banner | `dpdp scan page`, then a summary grouped by certainty |
+| [`skills/dpdp-map`](skills/dpdp-map/SKILL.md) | Map what a codebase collects, and record purpose, category, and basis | `dpdp scan code`, then one question at a time. It writes the human zone only after you confirm the words |
+| [`skills/dpdp-notice`](skills/dpdp-notice/SKILL.md) | Draft a consent notice, or say what to tell customers about a change | `dpdp notice inputs` and, for a change, `dpdp notice changes`. It does not edit the map |
+
+### Use it as a library
+
+```ts
+import { scan, scanCode, loadDataMap, mapFindings } from "dpdp-compliance-scanner";
+
+const page = await scan("https://example.com");
+const code = await scanCode(".");
+const map = await loadDataMap(".dpdp/data-map.yaml");
 ```
-Surfaces (CLI / skill)
-        │
-        ▼
-Data map (.dpdp/data-map.yaml)  ←  page scanner (Playwright)
-        │                         ←  code scanner (dpdp scan code)
-        ▼
-Mapper  ←  rules/*.yaml , vendors/*.yaml
-```
 
-## Explainers
+`scan` returns a `ScanResult` (schema 1.x) and also emits data points into the map. `scanCode` returns the code scan's data points, findings, and questions.
 
-The Sentinel site renders one page per rule. This repo does not store those pages. From a checkout, after `npm run build` (that command deletes `dist/`):
+### Explainers
+
+The Sentinel site renders one page per rule. From a checkout, after `npm run build` (that command deletes `dist/`):
 
 ```bash
 npm run build:explainers
@@ -245,43 +267,71 @@ npm run build:explainers
 
 That writes one `dist/explainers/<rule-id>.json` per file in `rules/`. The directory is gitignored and excluded from the npm package. The field contract is [`docs/explainers.md`](docs/explainers.md).
 
+### The old package name
+
+`dpdp-cookie-scanner`, `dpdp-cookie-scan`, and `dpdp-notice-lint` are deprecated bins in the shim package. They forward to `dpdp scan page`, `dpdp map diff`, and `dpdp notice lint`. Install `dpdp-compliance-scanner` directly. Details are in [`shim/README.md`](shim/README.md).
+
+## Questions people ask
+
+**Does India have a cookie law?**
+The DPDP Act, 2023 does not mention cookies. A cookie is personal data when it identifies a person or can be related to one (s.2(t)). Processing needs a lawful basis from a closed list: consent (s.6), or a limb of s.7. Consent must be preceded by notice (s.5) and be a clear affirmative act. Continued browsing is not that act.
+
+**Is a finding a compliance verdict?**
+A finding is a reading of one rule against what was observed, with a certainty tier and an enforceability date. Whether a product complies is a judgement for counsel, after they have seen the data map and the notice.
+
+**When do the obligations start?**
+The commencement notification is G.S.R. 843(E) of 13 November 2025. Most substantive obligations in the catalogue commence on 13 May 2027. The scanner still reports them, with that date on the finding.
+
+**What should I commit?**
+Commit `.dpdp/data-map.yaml`. The human zone (purpose, basis, retention, answers) is yours. The next scan refreshes observations and keeps those answers.
+
+**What does the notice draft leave blank?**
+Withdrawal, the grievance officer, a complaint to the Board, and the Eighth Schedule language (the skill marks it as Hindi). Rule 3 requires all four in a published notice. `dpdp notice lint` checks that a published page actually contains them.
+
+## Architecture
+
+One core, many surfaces. The core is the data map plus the mapper. The CLI, the Action, the skills, and a host that imports the library are thin renderers over the same findings.
+
+```
+Surfaces:  dpdp CLI · GitHub Action · skills · library import
+                         │
+                         ▼
+              .dpdp/data-map.yaml
+               ▲              ▲
+     page scanner          code scanner
+     (Playwright)          (manifests, JS/TS, Python)
+                         │
+                         ▼
+         Mapper  ←  rules/*.yaml , vendors/*.yaml
+                         │
+                         ▼
+         Findings · questions · notice inputs
+```
+
+Product shape is [`docs/spec-v2.md`](docs/spec-v2.md). Vocabulary is [`CONTEXT.md`](CONTEXT.md). Decisions are in [`docs/adr/`](docs/adr/).
+
 ## Licensing
 
 - **Code:** Apache-2.0 (see `LICENSE`, `NOTICE`).
-- **`vendors/` dataset:** CC BY-SA 4.0 (see `vendors/LICENSE`). `trackers/` is a symlink for one release.
-- **Rule rationale text and explainer pages:** CC BY-ND 4.0, owned by Rylematic
-  Technologies Private Limited.
-- **IP-to-country dataset:** DB-IP Lite, CC BY 4.0 (see `data/geo/README.md`
-  and `vendors/PROVENANCE.md`).
+- **`vendors/` dataset:** CC BY-SA 4.0 (see `vendors/LICENSE`). `trackers/` is a symlink kept for one release.
+- **Rule rationale text and explainer pages:** CC BY-ND 4.0, owned by Rylematic Technologies Private Limited.
+- **IP-to-country dataset:** DB-IP Lite, CC BY 4.0 (see [`data/geo/README.md`](data/geo/README.md) and [`vendors/PROVENANCE.md`](vendors/PROVENANCE.md)).
 
 ## Contributing
 
-Vendor records (especially Indian vendors) and bug-fixes are welcome.
-Rule-catalogue changes are welcome too, but they are reviewed as legal
-content, not just code. See [CONTRIBUTING.md](CONTRIBUTING.md) and
-[docs/contributing-rules.md](docs/contributing-rules.md).
+Vendor records, especially Indian vendors, and bug-fixes are welcome. Rule-catalogue changes are reviewed as legal content. See [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/contributing-rules.md](docs/contributing-rules.md).
 
 ## Trademarks
 
-"Sentinel" and "Vettam" are names and marks of Rylematic Technologies Private
-Limited. The code grant under the Apache-2.0 licence does **not** extend to
-these trademarks. Forks and derivative works may not use the "Sentinel" or
-"Vettam" names, logos, or marks — in the project name, package name, domain,
-or marketing — to present themselves as the official, endorsed, or affiliated
-tool. Choose your own name.
+"Sentinel" and "Vettam" are names and marks of Rylematic Technologies Private Limited. The code grant under the Apache-2.0 licence does **not** extend to these trademarks. Forks and derivative works may not use the "Sentinel" or "Vettam" names, logos, or marks — in the project name, package name, domain, or marketing — to present themselves as the official, endorsed, or affiliated tool. Choose your own name.
 
 ## Status
 
-**Last rule freshness active date:** 30 September 2026.
-
-The rule catalogue was last confirmed against the Gazette text of the Act,
-Rules, corrigendum, and commencement notification on this date. Product shape
-is [`docs/spec-v2.md`](docs/spec-v2.md). The Gazette PDFs, the
-provision-by-provision guide, the web-data map, and the v1 page-scanner spec
-are in [`docs/legal-sources/`](docs/legal-sources/README.md). Release history
-lives in [`CHANGELOG.md`](CHANGELOG.md).
+- **Package:** `dpdp-compliance-scanner` 2.0.0, bin `dpdp`.
+- **Rules:** 0.6.0. **Vendors:** 1.0.0.
+- **Law last verified:** 20 October 2026, against the Gazette text of the Digital Personal Data Protection Act, 2023, the DPDP Rules, 2025, the corrigendum (G.S.R. 892(E)), and the commencement notification (G.S.R. 843(E)).
+- **Product shape:** [`docs/spec-v2.md`](docs/spec-v2.md). Release history: [`CHANGELOG.md`](CHANGELOG.md).
 
 ---
 
-*This tool reports risk under the DPDP Act and Rules. It is not legal advice
-and does not state that any site is or is not compliant.*
+*This tool reports how the DPDP Act and Rules read against what it observed. It is not legal advice.*
