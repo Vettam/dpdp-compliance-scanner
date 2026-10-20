@@ -26,6 +26,18 @@ _Avoid_: engine (the page scanner's browser runtime is an implementation detail)
 The merged set of data points from every scan of one product, with the source each came from. Findings, questions, and notice drafts are derived from the data map, never from a single scan.
 _Avoid_: inventory, data flow diagram, RoPA
 
+**Site drift**:
+Data points, recipients, consent gates, and retention signals added or removed between two versions of a data map.
+_Avoid_: inventory change, finding drift
+
+**Catalogue drift**:
+Findings that changed because `rules_version` or `vendors_version` changed. Catalogue drift does not fail a build.
+_Avoid_: rule bump, severity change
+
+**Unmapped**:
+A data point, recipient, consent gate, or retention signal a scanner observed that the committed data map does not account for. `--fail-on unmapped` trips on those additions. A removal is not unmapped. An unclassified host is a different thing: a finding about a third party the vendor dataset does not recognise.
+_Avoid_: unmapped purpose, UNCLASSIFIED, stale
+
 **Vendor**:
 A third party that receives data points, recognised by its hosts, its packages in each ecosystem, and its signatures. A vendor is either a fiduciary in its own right or a processor acting on the data fiduciary's instructions.
 _Avoid_: tracker, tag, SDK, integration
@@ -35,7 +47,7 @@ A vendor that a specific data point reaches, with the country it resolves to. Th
 _Avoid_: third party, destination, sub-processor
 
 **Question**:
-A fact no scanner can observe that changes how a data point is read: the purpose it serves, how long it is kept, whether a site reaches children, whether an unrecognised import sends data out. Put to the developer or data fiduciary; the answer is recorded in the data map.
+A fact no scanner can observe that changes how a data point is read: the purpose it serves, how long it is kept, whether a site reaches children, whether an unrecognised import sends data out, whether a processor contract exists. Scanner questions are stored on the data map and answered in the human zone. Catalogue questions are derived when the map is shown and are not stored.
 _Avoid_: prompt, questionnaire item, todo
 
 ### Interpretation
@@ -49,11 +61,11 @@ How settled the law is for a finding: `settled` (the text is clear), `arguable` 
 _Avoid_: severity, risk level, score
 
 **Assertion**:
-A claim the data fiduciary records against a data point that no scanner can observe: its purpose and its lawful basis. The mapper tests an assertion against the Act; it never accepts it as a conclusion.
+A claim the data fiduciary records against a data point that no scanner can observe: its purpose, its lawful basis, and its stated retention. The `dpdp-map` skill writes it into the human zone of the data map. The mapper tests an assertion against the Act; it never accepts it as a conclusion.
 _Avoid_: declaration, label, override
 
 **Explainer**:
-The public page for one rule on the Sentinel website: the rule's rationale plus worked examples, what changed, related rules, and questions. Built from the rule file at the site's deploy; the only rendered home of the rule. A scan's findings link to it.
+The public page for one rule on the Sentinel website. This repo emits the JSON the site renders: rationale, changelog, related rule ids, and any question the rule raises. The rendered page lives only on the site. A finding links to it.
 _Avoid_: rule page, docs page, wiki
 
 **Data principal**:
@@ -81,7 +93,7 @@ The page that accompanies a notice draft or change notice and traces each senten
 _Avoid_: audit trail, appendix, evidence pack
 
 **Notice lint**:
-A check of a published consent notice against the data map: each data point itemised, withdrawal and grievance stated, English plus an Eighth Schedule language present. It never drafts.
+A check of a published consent notice against the data map: each data point itemised, each recipient named, withdrawal, grievance, and a complaint to the Board stated, English plus an Eighth Schedule language present. A marked blank does not pass. It never drafts.
 _Avoid_: notice scan, policy check
 
 **Consent gate**:

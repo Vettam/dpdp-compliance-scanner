@@ -1,0 +1,89 @@
+# Names the code scanner treats as personal data. Maintainer seed, 2026-10-14,
+# from the DPDP web data map Part 2 (C8 identity, and SENS for health, financial,
+# caste, religion, biometric, and government-id). Not copied from a third-party list.
+entries:
+  - name: name
+    kind: identity
+    category: C8
+    flags: []
+    variants: [full_name, first_name, last_name, user_name, username, display_name]
+  - name: phone
+    kind: contact
+    category: C8
+    flags: []
+    variants: [phone_number, mobile, mobile_number, tel]
+  - name: email
+    kind: contact
+    category: C8
+    flags: []
+    variants: [email_address, e_mail, user_email]
+  - name: address
+    kind: contact
+    category: C8
+    flags: []
+    variants: [street_address, postal_address, shipping_address, billing_address]
+  - name: dob
+    kind: identity
+    category: C8
+    flags: []
+    variants: [date_of_birth, birth_date, birthday]
+  - name: gender
+    kind: demographic
+    category: C8
+    flags: []
+    variants: [sex]
+  - name: pan
+    kind: government_id
+    category: C8
+    flags: [SENS]
+    variants: [pan_number, pan_card]
+  - name: aadhaar
+    kind: government_id
+    category: C8
+    flags: [SENS]
+    variants: [aadhaar_number, aadhar, uid]
+  - name: passport
+    kind: government_id
+    category: C8
+    flags: [SENS]
+    variants: [passport_number, passport_no]
+  - name: ip
+    kind: network
+    category: C8
+    flags: []
+    variants: [ip_address, client_ip]
+  - name: device_id
+    kind: device
+    category: C8
+    flags: []
+    variants: [deviceid, advertising_id]
+  - name: geolocation
+    kind: location
+    category: C8
+    flags: []
+    variants: [geo_location, latitude, longitude]
+  - name: health
+    kind: health
+    category: C8
+    flags: [SENS]
+    variants: [medical, diagnosis, health_data]
+  - name: income
+    kind: financial
+    category: C8
+    flags: [SENS]
+    variants: [salary, annual_income]
+  - name: caste
+    kind: demographic
+    category: C8
+    flags: [SENS]
+    variants: [jati]
+  - name: religion
+    kind: demographic
+    category: C8
+    flags: [SENS]
+    variants: [faith]
+  - name: biometric
+    kind: biometric
+    category: C8
+    flags: [SENS]
+    variants: [fingerprint, face_id, iris]

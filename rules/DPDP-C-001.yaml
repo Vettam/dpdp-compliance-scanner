@@ -11,6 +11,7 @@ flags: [PRE, 3PF]
 categories: [C6]
 owner: engineering
 penalty_band: consent_notice
+sources: [page]
 detection:
   match: request
   where:
@@ -38,3 +39,6 @@ changelog:
   - version: "0.1.0"
     date: "2026-09-15"
     note: Initial rule.
+  - version: "0.6.0"
+    date: "2026-10-15"
+    note: Declared sources page. Detection is unchanged.

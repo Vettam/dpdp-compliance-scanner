@@ -12,5 +12,6 @@ The codebase scanner cannot see everything: a hand-rolled `fetch` to an analytic
 ## Consequences
 
 - We own a schema that developers edit by hand. It must stay small and stable; breaking changes to it are breaking changes to the product.
+- CI's bookkeeping gate is `--fail-on unmapped`. It fails when a code scan observes a data point, recipient, consent gate, or retention signal the committed map does not account for. Catalogue drift does not fail the build. The GitHub Action posts that drift; the job status follows the scan, so committing the updated map clears the gate.
 - The same file is the hand-off to the notice draft and to the hosted dashboard, so neither needs to re-scan.
 - This mirrors the page scanner's existing rule: observation (facts) and interpretation (reading) are separate, and the facts can be trusted on their own.

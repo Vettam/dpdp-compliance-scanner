@@ -1,5 +1,5 @@
 name: dpdp
-description: Scan a URL with dpdp scan page --ci, upload findings.json, and post findings.md on the PR.
+description: Scan a page and/or a repository, upload the data map and diff, and post drift above findings on the PR.
 author: Rylematic Technologies Private Limited
 branding:
   icon: shield
@@ -7,10 +7,15 @@ branding:
 
 inputs:
   url:
-    description: URL to scan
-    required: true
+    description: URL to scan with dpdp scan page. Empty skips the page scan.
+    required: false
+    default: ""
+  code:
+    description: "Run dpdp scan code --ci on the checked-out repository."
+    required: false
+    default: "false"
   version:
-    description: npm package version to run (e.g. 0.3.0). Empty means latest.
+    description: npm package version to run (e.g. 2.0.0). Empty means latest.
     required: false
     default: ""
   gpc:
@@ -34,15 +39,15 @@ inputs:
     required: false
     default: "false"
   fail-on:
-    description: "Opt-in CI gate. Only 'settled' is accepted; never fails on arguable or open findings."
+    description: "Opt-in gate forwarded to the scans. 'settled' fails on a settled finding. 'unmapped' fails dpdp scan code when the scan observed something the committed data map does not account for. Catalogue drift never fails the job."
     required: false
     default: ""
   out:
-    description: Directory for findings.json and findings.md
+    description: Directory for findings, the data map diff, and the uploaded artifact
     required: false
     default: "dpdp-scan"
   comment:
-    description: Post (or update) findings.md as a pull-request comment
+    description: Post (or update) the drift table and findings as a pull-request comment
     required: false
     default: "true"
   github-token:
@@ -52,29 +57,58 @@ inputs:
 
 outputs:
   json-path:
-    description: Path to findings.json
-    value: "${{ steps.scan.outputs.json-path }}"
+    description: Path to findings.json (the page scan when url is set, otherwise the code scan)
+    value: "${{ steps.paths.outputs.json-path }}"
   md-path:
     description: Path to findings.md
-    value: "${{ steps.scan.outputs.md-path }}"
+    value: "${{ steps.paths.outputs.md-path }}"
+  diff-path:
+    description: Path to datamap-diff.json on a pull request
+    value: "${{ steps.diff.outputs.diff-path }}"
 
 runs:
   using: composite
   steps:
+    - name: Require a url or a code scan
+      shell: bash
+      env:
+        SCAN_URL: "${{ inputs.url }}"
+        SCAN_CODE: "${{ inputs.code }}"
+      run: |
+        set -euo pipefail
+        if [ -z "$SCAN_URL" ] && [ "$SCAN_CODE" != "true" ]; then
+          echo "error: set url or code: true" >&2
+          exit 2
+        fi
+
     - uses: actions/setup-node@v4
       with:
         node-version: "22"
 
     - uses: browser-actions/setup-chrome@v1
       id: chrome
+      if: inputs.url != ''
+
+    - name: Install dpdp
+      shell: bash
+      env:
+        SCAN_VERSION: "${{ inputs.version }}"
+      run: |
+        set -euo pipefail
+        PKG="dpdp-compliance-scanner"
+        if [ -n "$SCAN_VERSION" ]; then
+          PKG="${PKG}@${SCAN_VERSION}"
+        fi
+        npm install --no-save --prefix "$RUNNER_TEMP/dpdp" "$PKG"
+        echo "$RUNNER_TEMP/dpdp/node_modules/.bin" >> "$GITHUB_PATH"
 
     - name: Run dpdp scan page --ci
-      id: scan
+      id: page
+      if: inputs.url != ''
       shell: bash
       env:
         CHROME_PATH: "${{ steps.chrome.outputs.chrome-path }}"
         SCAN_URL: "${{ inputs.url }}"
-        SCAN_VERSION: "${{ inputs.version }}"
         SCAN_GPC: "${{ inputs.gpc }}"
         SCAN_QUERY: "${{ inputs.include-query }}"
         SCAN_TIMEOUT: "${{ inputs.timeout }}"
@@ -83,64 +117,134 @@ runs:
         SCAN_FAIL_ON: "${{ inputs.fail-on }}"
         SCAN_OUT: "${{ inputs.out }}"
       run: |
-        set -euo pipefail
-        PKG="dpdp-compliance-scanner"
-        if [ -n "$SCAN_VERSION" ]; then
-          PKG="dpdp-compliance-scanner@${SCAN_VERSION}"
-        fi
+        set -uo pipefail
         EXTRA=()
         if [ "$SCAN_GPC" = "true" ]; then EXTRA+=(--gpc); fi
         if [ "$SCAN_QUERY" = "true" ]; then EXTRA+=(--include-query); fi
         if [ "$SCAN_INTERACT" = "true" ]; then EXTRA+=(--interact); fi
-        if [ -n "$SCAN_FAIL_ON" ]; then EXTRA+=(--fail-on "$SCAN_FAIL_ON"); fi
-        npx --yes --package="$PKG" dpdp scan page "$SCAN_URL" --ci --out "$SCAN_OUT" \
+        # unmapped is the code-scan gate. The page scan accepts only settled.
+        if [ "$SCAN_FAIL_ON" = "settled" ]; then EXTRA+=(--fail-on settled); fi
+        ec=0
+        dpdp scan page "$SCAN_URL" --ci --out "$SCAN_OUT" \
           --timeout "$SCAN_TIMEOUT" --settle "$SCAN_SETTLE" --browser "$CHROME_PATH" \
-          ${EXTRA[@]+"${EXTRA[@]}"}
-        echo "json-path=${SCAN_OUT}/findings.json" >> "$GITHUB_OUTPUT"
-        echo "md-path=${SCAN_OUT}/findings.md" >> "$GITHUB_OUTPUT"
+          ${EXTRA[@]+"${EXTRA[@]}"} || ec=$?
+        echo "exit-code=$ec" >> "$GITHUB_OUTPUT"
+
+    - name: Run dpdp scan code --ci
+      id: code
+      if: inputs.code == 'true'
+      shell: bash
+      env:
+        SCAN_FAIL_ON: "${{ inputs.fail-on }}"
+        SCAN_OUT: "${{ inputs.out }}/code"
+      run: |
+        set -uo pipefail
+        EXTRA=()
+        if [ -n "$SCAN_FAIL_ON" ]; then EXTRA+=(--fail-on "$SCAN_FAIL_ON"); fi
+        ec=0
+        dpdp scan code --ci --out "$SCAN_OUT" \
+          ${EXTRA[@]+"${EXTRA[@]}"} || ec=$?
+        echo "exit-code=$ec" >> "$GITHUB_OUTPUT"
+
+    - name: Diff the committed data map
+      id: diff
+      if: github.event_name == 'pull_request'
+      shell: bash
+      env:
+        SCAN_OUT: "${{ inputs.out }}"
+        BASE_SHA: "${{ github.event.pull_request.base.sha }}"
+      run: |
+        set -uo pipefail
+        # Shallow clones do not have the base commit. Fetch it when it is missing.
+        git cat-file -e "${BASE_SHA}^{commit}" 2>/dev/null || git fetch --depth=1 origin "$BASE_SHA" || true
+        # The diff is the report. Catalogue drift never fails the job, and a
+        # data map this PR commits is already accounted for, so this step's
+        # exit code is not the job status. The unmapped gate is on scan code.
+        ec=0
+        dpdp map diff --from "$BASE_SHA" --to HEAD --ci --md --out "$SCAN_OUT" || ec=$?
+        if [ "$ec" != "0" ]; then echo "::warning::dpdp map diff exited $ec"; fi
+        echo "exit-code=$ec" >> "$GITHUB_OUTPUT"
+        echo "diff-path=${SCAN_OUT}/datamap-diff.json" >> "$GITHUB_OUTPUT"
+
+    - name: Record output paths
+      id: paths
+      if: always()
+      shell: bash
+      env:
+        SCAN_URL: "${{ inputs.url }}"
+        SCAN_CODE: "${{ inputs.code }}"
+        SCAN_OUT: "${{ inputs.out }}"
+      run: |
+        set -euo pipefail
+        if [ -n "$SCAN_URL" ]; then
+          echo "json-path=${SCAN_OUT}/findings.json" >> "$GITHUB_OUTPUT"
+          echo "md-path=${SCAN_OUT}/findings.md" >> "$GITHUB_OUTPUT"
+        elif [ "$SCAN_CODE" = "true" ]; then
+          echo "json-path=${SCAN_OUT}/code/findings.json" >> "$GITHUB_OUTPUT"
+          echo "md-path=${SCAN_OUT}/code/findings.md" >> "$GITHUB_OUTPUT"
+        fi
 
     - uses: actions/upload-artifact@v4
+      if: always()
       with:
         name: dpdp-scan
+        if-no-files-found: ignore
         path: |
-          ${{ inputs.out }}/findings.json
-          ${{ inputs.out }}/findings.md
-        if-no-files-found: error
+          ${{ inputs.out }}
+          .dpdp/data-map.yaml
 
-    - name: Post findings.md on the pull request
-      if: "${{ inputs.comment == 'true' && github.event_name == 'pull_request' }}"
+    - name: Post drift and findings on the pull request
+      if: "${{ always() && inputs.comment == 'true' && github.event_name == 'pull_request' }}"
       uses: actions/github-script@v7
       env:
         SCAN_OUT: "${{ inputs.out }}"
         SCAN_URL: "${{ inputs.url }}"
+        SCAN_CODE: "${{ inputs.code }}"
+        ACTION_PATH: "${{ github.action_path }}"
       with:
         github-token: "${{ inputs.github-token }}"
         script: |
           const fs = require('fs');
           const path = require('path');
+          const { pathToFileURL } = require('url');
+          const { buildComment } = await import(pathToFileURL(path.join(process.env.ACTION_PATH, 'comment.mjs')).href);
+          const out = process.env.SCAN_OUT;
+          const read = (rel) => {
+            const p = path.join(out, rel);
+            return fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : '';
+          };
+          const summary = [
+            process.env.SCAN_URL ? `Scanned ${process.env.SCAN_URL} with \`dpdp scan page --ci\`.` : '',
+            process.env.SCAN_CODE === 'true' ? 'Scanned the repository with `dpdp scan code --ci`.' : '',
+          ].filter(Boolean).join(' ');
+          const body = buildComment({
+            summary: summary || 'DPDP scan.',
+            drift: read('datamap-diff.md'),
+            findings: [read('findings.md'), read('code/findings.md')],
+          });
           const marker = '<!-- dpdp-cookie-scan -->';
-          const mdPath = path.join(process.env.SCAN_OUT, 'findings.md');
-          let report = fs.readFileSync(mdPath, 'utf8');
-          const limit = 60000;
-          if (report.length > limit) {
-            report = report.slice(0, limit) + '\n\n…truncated. Full report is in the `dpdp-scan` artifact.\n';
-          }
-          const body = [
-            marker,
-            `Scanned ${process.env.SCAN_URL} with \`dpdp scan page --ci\`.`,
-            '',
-            report,
-          ].join('\n');
           const { owner, repo } = context.repo;
           const issue_number = context.payload.pull_request.number;
           const comments = await github.paginate(github.rest.issues.listComments, {
             owner, repo, issue_number, per_page: 100,
           });
-          const existing = comments.find((c) =>
-            c.body && c.body.includes(marker) && c.user && c.user.login === 'github-actions[bot]'
-          );
+          const existing = comments.find((c) => c.body && c.body.includes(marker));
           if (existing) {
             await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
           } else {
             await github.rest.issues.createComment({ owner, repo, issue_number, body });
           }
+
+    - name: Apply the fail-on gate
+      if: always()
+      shell: bash
+      env:
+        PAGE_EXIT: "${{ steps.page.outputs.exit-code }}"
+        CODE_EXIT: "${{ steps.code.outputs.exit-code }}"
+      run: |
+        set -uo pipefail
+        fail=0
+        for c in "$PAGE_EXIT" "$CODE_EXIT"; do
+          if [ -n "$c" ] && [ "$c" != "0" ]; then fail="$c"; fi
+        done
+        exit "$fail"

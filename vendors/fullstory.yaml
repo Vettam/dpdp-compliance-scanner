@@ -1,0 +1,21 @@
+id: fullstory
+vendor: FullStory
+match:
+  hosts: ["www.fullstory.com", "fullstory.com", "rs.fullstory.com"]
+  cookies: ["fs_uid", "fs_fsaa"]
+packages:
+  npm: ["@fullstory/browser"]
+data_points: [persistent_browser_id, mouse_movements, clicks, keystroke_timing, dom_snapshot, ip_address]
+category: C5
+flags: [3PF, XFER, KIDS, PRE, SENS, PII-LEAK]
+role: processor
+lawful_basis: consent
+provisions: ["s.6(1)", "s.9(3)", "Rule 6(1)(a)"]
+notice_itemisation: >
+  A persistent identifier, mouse movements, clicks, keystroke timing and DOM
+  snapshots, plus your IP address, sent to FullStory for session replay.
+destination_countries: [US]
+fires_pre_consent_by_default: true
+withdrawal_mechanism: "Stop firing; clear fs_uid cookies."
+last_verified: "2026-09-15"
+provenance: direct observation

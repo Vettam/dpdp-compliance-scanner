@@ -22,7 +22,7 @@ The output is a set of **findings**. Each finding says: what we observed, which 
 - It is **not an enforcement gate.** It surfaces risk. It never blocks a build or a deploy. Exit code is `0` on any successful scan.
 - It is **not a consent manager.** It does not fix anything.
 - It is **not a compliance verdict.** It never says a site "is" or "is not" compliant. That judgement, with counsel review, is the paid Sentinel product.
-- It is **not a static analyser.** It observes a running page. It does not read source code.
+- It is **not a static analyser of the page.** The page scanner observes a running page. Reading a repository is the code scanner; see [`docs/spec-v2.md`](../spec-v2.md) §5.2.
 
 ### 0.3 The one idea that matters
 

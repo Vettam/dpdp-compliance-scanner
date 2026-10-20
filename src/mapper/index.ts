@@ -229,7 +229,7 @@ function evaluateRule(
     }
     return matches;
   }
-  // storage / meta matches: not used yet.
+  // storage / meta / data_point: data_point rules are applied in mapDataMap.
   return [];
 }
 

@@ -1,0 +1,48 @@
+id: DPDP-C-080
+title: No way for a person to obtain a summary of their data
+certainty: arguable
+enforceable_from: "2027-05-13"
+observable: true
+provisions:
+  - s.11(1)(a)
+flags: []
+categories: [C8]
+owner: counsel
+sources: [code]
+penalty_band: rights
+detection:
+  match: map
+  where:
+    rights_endpoint_present:
+      right: access
+      present: false
+    category: C8
+    observation_kind: schema_column
+    source_kind: code
+needs_input: []
+rationale_plain: >
+  Section 11(1)(a) gives a person the right to a summary of the personal data
+  being processed and of the processing activities. The repository stores
+  identity or transaction data and has no access route the scanner can see.
+  The right itself is clear. Whether the absence of an endpoint is a
+  contravention is not: the means of asking can be published elsewhere.
+rationale_dev: >
+  Detection: a code map with a schema column, at least one C8 point, and no
+  rights endpoint whose right is access. A manifest-only recipient is not a
+  stored column and does not match. The right in s.11(1)(a) is settled for a
+  person who gave consent, including section 7(a) processing. Competing
+  reading: Rule 14 lets the fiduciary publish the means of making a request,
+  so a missing HTTP route is not itself a contravention. Emitted as arguable,
+  which is the tier spec §6.2 assigns.
+remediation_summary: >
+  Provide a way for a person to obtain a summary of her data, and make that
+  way observable to this scan or to the notice.
+explainer_url: https://sentinel.vettam.ai/rules/DPDP-C-080
+since: "0.6.0"
+changelog:
+  - version: "0.6.0"
+    date: "2026-10-15"
+    note: >
+      Initial rule. Arguable. s.11(1)(a) settles the right to a summary;
+      whether a missing endpoint is a contravention is contested because the
+      means of asking may be published outside the repository.

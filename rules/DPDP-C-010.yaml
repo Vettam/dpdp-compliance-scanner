@@ -11,6 +11,7 @@ flags: [PRE]
 categories: [C4]
 owner: engineering
 penalty_band: consent_notice
+sources: [page]
 detection:
   match: request
   where:
@@ -42,3 +43,6 @@ changelog:
   - version: "0.3.0"
     date: "2026-09-17"
     note: Initial rule. Arguable tier; competes with the s.17(2)(b) statistics exemption.
+  - version: "0.6.0"
+    date: "2026-10-15"
+    note: Declared sources page. Detection is unchanged.

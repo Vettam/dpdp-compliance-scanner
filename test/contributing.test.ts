@@ -8,7 +8,7 @@ const rulesGuide = readFileSync(join(process.cwd(), "docs", "contributing-rules.
 describe("contribution guides", () => {
   it("ships CONTRIBUTING.md as the public entry point", () => {
     expect(existsSync(join(process.cwd(), "CONTRIBUTING.md"))).toBe(true);
-    expect(contributing).toMatch(/Trackers/);
+    expect(contributing).toMatch(/Vendors/);
     expect(contributing).toMatch(/rules\//);
     expect(contributing).toMatch(/changeset/i);
     expect(contributing).toMatch(/Indian vendors/);

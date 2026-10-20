@@ -1,0 +1,47 @@
+id: DPDP-C-081
+title: No way for a person to request erasure
+certainty: arguable
+enforceable_from: "2027-05-13"
+observable: true
+provisions:
+  - s.12(1)
+  - s.12(3)
+flags: []
+categories: []
+owner: counsel
+sources: [code]
+penalty_band: rights
+detection:
+  match: map
+  where:
+    rights_endpoint_present:
+      right: erase
+      present: false
+    observation_kind: schema_column
+    source_kind: code
+needs_input: []
+rationale_plain: >
+  Section 12 gives a person the right to correction and to erasure of personal
+  data she has consented to, including data she provided for a specified
+  purpose. The repository stores columns of personal data and has no erasure
+  route the scanner can see. The right is clear. A missing route is not, by
+  itself, proof the right cannot be exercised.
+rationale_dev: >
+  Detection: a code map with a schema column and no rights endpoint whose
+  right is erase. An erase route satisfies the rule. Competing reading: the
+  same as DPDP-C-080 — Rule 14 requires the fiduciary to publish how a request
+  is made, which need not be an HTTP route in this repository. s.12(3) is the
+  erasure duty, subject to retention the law or the specified purpose still
+  requires. Emitted as arguable.
+remediation_summary: >
+  Provide a way for a person to request erasure, including where a processor
+  holds a copy.
+explainer_url: https://sentinel.vettam.ai/rules/DPDP-C-081
+since: "0.6.0"
+changelog:
+  - version: "0.6.0"
+    date: "2026-10-15"
+    note: >
+      Initial rule. Arguable. s.12 settles the right to erasure; a missing
+      endpoint is not settled as a contravention because the request mechanism
+      may sit outside the repository.

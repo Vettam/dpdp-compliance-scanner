@@ -1,0 +1,24 @@
+id: intercom
+vendor: Intercom
+match:
+  hosts: ["widget.intercom.io", "js.intercomcdn.com", "api.intercom.io", "intercom.com"]
+  cookies: ["intercom-id-*", "intercom-session-*", "intercom-lm-*"]
+packages:
+  npm: ["@intercom/messenger-js-sdk", "intercom-client"]
+  rubygems: ["intercom"]
+  cocoapods: ["Intercom"]
+  composer: ["intercom/intercom-php"]
+data_points: [identity, message_content, page_context, ip_address, user_agent]
+category: C7
+flags: [3PF, XFER, SENS]
+role: processor
+lawful_basis: consent
+provisions: ["s.6(1)", "s.8(2)", "s.11(1)(b)", "s.16"]
+notice_itemisation: >
+  Identity, message content and page context, plus IP address and browser
+  details, sent to Intercom for support chat.
+destination_countries: [US]
+fires_pre_consent_by_default: false
+withdrawal_mechanism: "Stop firing; clear intercom-* cookies."
+last_verified: "2026-09-15"
+provenance: direct observation

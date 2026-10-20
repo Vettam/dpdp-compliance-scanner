@@ -79,6 +79,20 @@
         "product"
       ]
     },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "page",
+          "code",
+          "database"
+        ]
+      },
+      "default": [
+        "page"
+      ]
+    },
     "penalty_band": {
       "type": "string"
     },
@@ -94,7 +108,11 @@
             "storage",
             "api_call",
             "embed",
-            "meta"
+            "meta",
+            "data_point",
+            "recipient",
+            "consent_gate",
+            "map"
           ]
         },
         "where": {
@@ -221,6 +239,185 @@
               ]
             },
             "sri": {
+              "type": "boolean"
+            },
+            "basis": {
+              "type": "string",
+              "enum": [
+                "consent",
+                "voluntarily_provided",
+                "legal_obligation",
+                "medical_emergency",
+                "employment",
+                "state_function",
+                "unstated"
+              ]
+            },
+            "category_in": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "C0",
+                  "C1",
+                  "C2",
+                  "C3",
+                  "C4",
+                  "C5",
+                  "C6",
+                  "C7",
+                  "C8",
+                  "C9",
+                  "C10",
+                  "UNCLASSIFIED"
+                ]
+              }
+            },
+            "source_kind": {
+              "type": "string",
+              "enum": [
+                "page",
+                "code",
+                "database"
+              ]
+            },
+            "category": {
+              "type": "string",
+              "enum": [
+                "C0",
+                "C1",
+                "C2",
+                "C3",
+                "C4",
+                "C5",
+                "C6",
+                "C7",
+                "C8",
+                "C9",
+                "C10",
+                "UNCLASSIFIED"
+              ]
+            },
+            "category_absent": {
+              "type": "string",
+              "enum": [
+                "C0",
+                "C1",
+                "C2",
+                "C3",
+                "C4",
+                "C5",
+                "C6",
+                "C7",
+                "C8",
+                "C9",
+                "C10",
+                "UNCLASSIFIED"
+              ]
+            },
+            "flags_any": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": [
+                  "KIDS",
+                  "3PF",
+                  "PROC",
+                  "XFER",
+                  "DEC",
+                  "SENS",
+                  "FP",
+                  "PRE",
+                  "PII-LEAK"
+                ]
+              }
+            },
+            "basis_not": {
+              "type": "string",
+              "enum": [
+                "consent",
+                "voluntarily_provided",
+                "legal_obligation",
+                "medical_emergency",
+                "employment",
+                "state_function",
+                "unstated"
+              ]
+            },
+            "consent_gate_present": {
+              "type": "boolean"
+            },
+            "consent_gate_kind": {
+              "type": "string",
+              "enum": [
+                "banner",
+                "checkbox",
+                "dialog",
+                "code_check"
+              ]
+            },
+            "retention_stated": {
+              "type": "boolean"
+            },
+            "retention_signal_any": {
+              "type": "boolean"
+            },
+            "recipient_role": {
+              "type": "string",
+              "enum": [
+                "processor",
+                "fiduciary",
+                "depends_on_configuration",
+                "independent_or_joint_fiduciary",
+                "processor_or_3pf"
+              ]
+            },
+            "recipient_country_not": {
+              "type": "string"
+            },
+            "rights_endpoint_present": {
+              "type": "object",
+              "properties": {
+                "right": {
+                  "type": "string",
+                  "enum": [
+                    "access",
+                    "erase",
+                    "correct"
+                  ]
+                },
+                "present": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "right",
+                "present"
+              ],
+              "additionalProperties": false
+            },
+            "observation_kind": {
+              "type": "string",
+              "enum": [
+                "cookie",
+                "storage_key",
+                "request",
+                "api_call",
+                "embed",
+                "banner",
+                "package",
+                "http_call",
+                "schema_column",
+                "input_field",
+                "consent_gate",
+                "retention_signal",
+                "rights_endpoint"
+              ]
+            },
+            "notice_itemisation": {
+              "type": "boolean"
+            },
+            "mentions_grievance": {
               "type": "boolean"
             }
           },

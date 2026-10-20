@@ -82,6 +82,7 @@ describe("lintNotice", () => {
       "We use Hotjar for behavioural analytics: session recordings, heatmaps, click and move data, and device details.",
       "You may withdraw consent at any time by clicking the withdraw button below.",
       "Our Grievance Officer can be reached at grievance@acme.in for complaints.",
+      "You can complain to the Data Protection Board.",
       "यह सूचना हिंदी में भी उपलब्ध है।",
     ].join("\n");
     const r = lintNotice({ noticeText: notice, noticeUrl: "https://acme.in/privacy", scanResult: scanWith(["meta-pixel", "hotjar"]), trackers });
@@ -133,7 +134,51 @@ describe("lintNotice", () => {
     expect(ids).toContain("NL-001");
     expect(ids).toContain("NL-002");
     expect(ids).toContain("NL-003");
+    expect(ids).toContain("NL-004");
     expect(ids.some((id) => id.startsWith("NL-100-"))).toBe(false);
+  });
+
+  it("accepts Tamil as an Eighth Schedule script", () => {
+    const notice = "You may withdraw consent here. Grievance Officer: grievance@acme.in. Complain to the Data Protection Board. தமிழ் அறிவிப்பு.";
+    const bilingual = lintNotice({ noticeText: notice }).checks.find((c) => c.id === "NL-003")!;
+    expect(bilingual.status).toBe("pass");
+  });
+
+  it("does not treat a Board complaint as the grievance officer", () => {
+    const notice = "You may withdraw consent here. You may make a complaint to the Board using its website. हिंदी सूचना उपलब्ध है।";
+    const r = lintNotice({ noticeText: notice });
+    expect(r.checks.find((c) => c.id === "NL-002")!.status).toBe("fail");
+    expect(r.checks.find((c) => c.id === "NL-004")!.status).toBe("pass");
+  });
+
+  it("does not treat a marked blank as withdrawal, grievance, the Board, or Hindi", () => {
+    const notice = [
+      "We process phone numbers to deliver the order.",
+      "[BLANK: withdrawal mechanism]",
+      "[BLANK: grievance officer]",
+      "[BLANK: complaint to the Board]",
+      "[BLANK: Hindi]",
+    ].join("\n");
+    const r = lintNotice({
+      noticeText: notice,
+      dataPoints: [
+        {
+          id: "dp_users_phone",
+          name: "phone",
+          purpose: "To deliver the order.",
+          how_long: "",
+          locations: [],
+          recipients: [],
+        },
+      ],
+    });
+    expect(r.checks.filter((c) => c.status === "fail").map((c) => c.id).sort()).toEqual([
+      "NL-001",
+      "NL-002",
+      "NL-003",
+      "NL-004",
+    ]);
+    expect(r.checks.find((c) => c.id === "NL-200-dp_users_phone")!.status).toBe("pass");
   });
 
   it("stamps schema_version and notice_url", () => {

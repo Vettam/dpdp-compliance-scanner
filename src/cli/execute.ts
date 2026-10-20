@@ -1,5 +1,13 @@
-import { join } from "node:path";
-import { scan, type ScanRunOptions } from "../index.js";
+import { dirname, join } from "node:path";
+import { scanPage, type ScanRunOptions } from "../index.js";
+import {
+  DATA_MAP_FILENAME,
+  emptyDataMap,
+  mergeScan,
+  parseDataMap,
+  serializeDataMap,
+  type EmittedScan,
+} from "../map/index.js";
 import { renderTerminal } from "../report/terminal.js";
 import { renderJson } from "../report/json.js";
 import { renderMarkdown } from "../report/markdown.js";
@@ -24,6 +32,7 @@ export interface CliArgs {
   browser: string;
   interact: boolean;
   failOn: string;
+  noMap?: boolean;
 }
 
 export interface CliDeps {
@@ -36,9 +45,11 @@ export interface CliDeps {
   engine?: ScanEngine;
   rulesDir: string;
   trackersDir: string;
+  /** Override `.dpdp/data-map.yaml`. Defaults to that path under the process cwd. */
+  mapPath?: string;
 }
 
-const USAGE = "usage: dpdp scan page <url> [options]\n";
+const USAGE = "usage: dpdp scan page <url> [--no-map] [options]\n";
 
 export async function execute(args: CliArgs, deps: CliDeps): Promise<number> {
   if (args.rulesVersion) {
@@ -76,7 +87,8 @@ export async function execute(args: CliArgs, deps: CliDeps): Promise<number> {
       deps.mkdir(args.out);
       scanOpts.screenshotPath = join(args.out, "screenshot.png");
     }
-    const sr = await scan(args.url, scanOpts);
+    const { result: sr, emitted } = await scanPage(args.url, scanOpts);
+    if (!args.noMap) writeDataMap(emitted, deps);
 
     const useColor = !args.ci;
     const terminal = renderTerminal(sr, { color: useColor });
@@ -112,6 +124,22 @@ export async function execute(args: CliArgs, deps: CliDeps): Promise<number> {
     deps.exit(3);
     return 3;
   }
+}
+
+function writeDataMap(emitted: EmittedScan, deps: CliDeps): void {
+  const mapPath = deps.mapPath ?? join(process.cwd(), DATA_MAP_FILENAME);
+  let previous: string | undefined;
+  if (deps.readFile) {
+    try {
+      previous = deps.readFile(mapPath);
+    } catch (e) {
+      if (!String((e as Error).message).includes("ENOENT")) throw e;
+    }
+  }
+  const base = previous ? parseDataMap(previous) : emptyDataMap(emitted.generated_by);
+  const merged = mergeScan(base, emitted);
+  deps.mkdir(dirname(mapPath));
+  deps.writeFile(mapPath, serializeDataMap(merged, previous));
 }
 
 export interface MapDiffArgs {

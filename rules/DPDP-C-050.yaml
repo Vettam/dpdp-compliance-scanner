@@ -9,6 +9,7 @@ flags: [PRE]
 categories: [C4, C5, C6, C9]
 owner: engineering
 penalty_band: consent_notice
+sources: [page]
 detection:
   match: request
   where:
@@ -44,3 +45,6 @@ changelog:
   - version: "0.3.0"
     date: "2026-09-17"
     note: Corrected certainty from arguable to open to match the authoritative tier table in spec §5.3 (DPDP is silent on browser signals; no Board guidance).
+  - version: "0.6.0"
+    date: "2026-10-15"
+    note: Declared sources page. Detection is unchanged.

@@ -1,0 +1,44 @@
+id: DPDP-C-071
+title: Stored personal data has no observable deletion path
+certainty: arguable
+enforceable_from: "2027-05-13"
+observable: true
+provisions:
+  - s.8(7)
+  - s.6(6)
+flags: []
+categories: []
+owner: counsel
+sources: [code]
+penalty_band: retention
+detection:
+  match: data_point
+  where:
+    retention_stated: true
+    retention_signal_any: false
+    source_kind: code
+needs_input: []
+rationale_plain: >
+  A retention period is stated, and the code the scanner can see has no
+  deletion path for this data: no deleted-at column, no expiry, no scheduled
+  job. Section 8(7) requires erasure when the purpose is no longer served, and
+  section 6(6) requires the fiduciary to cause its processors to stop as well.
+  The period is a claim. The mechanism is not in the repository.
+rationale_dev: >
+  Detection: retention.stated is non-empty and retention.signals is empty on a
+  code-observed point. A soft-delete column, TTL, or scheduled deletion is a
+  signal, and the rule does not match when one is present. Competing reading:
+  the deletion job may live outside this repository (a console, a runbook, a
+  vendor setting), so absence here is not proof there is no path. Tier is
+  arguable. s.8(7) erasure; s.6(6) cessation by the fiduciary and its processors.
+remediation_summary: >
+  Point the stated period at a deletion path this repository can see, or
+  record where that path lives.
+explainer_url: https://sentinel.vettam.ai/rules/DPDP-C-071
+since: "0.6.0"
+changelog:
+  - version: "0.6.0"
+    date: "2026-10-15"
+    note: >
+      Initial rule. Arguable. A stated period with no retention signal may
+      mean the mechanism is outside the repository, so this is not settled.

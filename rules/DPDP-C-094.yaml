@@ -1,0 +1,47 @@
+id: DPDP-C-094
+title: Recipient outside India (permitted by default)
+certainty: open
+enforceable_from: "2027-05-13"
+observable: true
+provisions:
+  - s.16
+flags: [XFER]
+categories: []
+owner: counsel
+sources: [code]
+penalty_band: none
+detection:
+  match: recipient
+  where:
+    recipient_country_not: IN
+    source_kind: code
+needs_input: []
+rationale_plain: >
+  A recipient recorded from the code is outside India. This is not a
+  contravention. Section 16 permits transfer of personal data outside India
+  unless the Central Government restricts it. The same corrective note as the
+  page rule: a transfer is allowed unless the destination is restricted. The
+  tier is open only because Significant Data Fiduciary localisation is not
+  yet specified.
+rationale_dev: >
+  Detection: a code-observed recipient whose country is set and is not IN.
+  An empty country does not match. This generalises DPDP-C-020 from page
+  requests to recipients the code scanner records. s.16(1) is a blacklist, not
+  a whitelist. Competing reading: Rule 13(4) may later require an SDF to keep
+  specified personal data and its traffic data in India, and no category has
+  been specified. s.16(2) leaves a sectoral law that is stricter, such as RBI
+  payment-data localisation, in force. Tier is open, same corrective note as
+  DPDP-C-020.
+remediation_summary: >
+  None required by default. If the fiduciary is or may be designated a
+  Significant Data Fiduciary, assess Rule 13(4) before transfer. Sectoral
+  localisation still applies under s.16(2).
+explainer_url: https://sentinel.vettam.ai/rules/DPDP-C-094
+since: "0.6.0"
+changelog:
+  - version: "0.6.0"
+    date: "2026-10-15"
+    note: >
+      Initial rule. Open. Generalises DPDP-C-020 to code-observed recipients.
+      s.16 permits transfer unless the destination is restricted; SDF
+      localisation under Rule 13(4) is not yet specified.

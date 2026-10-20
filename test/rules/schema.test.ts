@@ -89,6 +89,53 @@ describe("RuleSchema", () => {
     expect(r.ok).toBe(false);
   });
 
+  it("accepts each map predicate from spec §6.1", () => {
+    const predicates: Array<Record<string, unknown>> = [
+      { source_kind: "code" },
+      { category: "C8" },
+      { category_absent: "C10" },
+      { flags_any: ["PROC"] },
+      { basis_not: "unstated" },
+      { consent_gate_present: false },
+      { consent_gate_kind: "checkbox" },
+      { retention_stated: false },
+      { retention_signal_any: false },
+      { recipient_role: "processor" },
+      { recipient_country_not: "IN" },
+      { rights_endpoint_present: { right: "access", present: false } },
+      { observation_kind: "schema_column" },
+      { notice_itemisation: false },
+      { mentions_grievance: false },
+    ];
+    for (const where of predicates) {
+      const r = validateRule({
+        ...validRule,
+        sources: ["code"],
+        detection: { match: "map", where },
+      });
+      expect(r.ok, JSON.stringify(where)).toBe(true);
+    }
+    for (const match of ["recipient", "consent_gate", "map"]) {
+      const r = validateRule({
+        ...validRule,
+        detection: { match, where: { source_kind: "code" } },
+      });
+      expect(r.ok, match).toBe(true);
+    }
+  });
+
+  it("accepts a data-point rule with basis and category_in", () => {
+    const r = validateRule({
+      ...validRule,
+      id: "DPDP-C-093",
+      detection: {
+        match: "data_point",
+        where: { basis: "voluntarily_provided", category_in: ["C5", "C6", "C9"] },
+      },
+    });
+    expect(r.ok).toBe(true);
+  });
+
   it("accepts a banner-matched rule with banner conditions", () => {
     const r = validateRule({
       ...validRule,

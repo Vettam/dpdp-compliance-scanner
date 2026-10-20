@@ -1,0 +1,45 @@
+id: DPDP-C-073
+title: Withdrawal does not propagate to processors
+certainty: arguable
+enforceable_from: "2027-05-13"
+observable: true
+provisions:
+  - s.6(6)
+flags: [PROC]
+categories: []
+owner: counsel
+sources: [code]
+penalty_band: retention
+detection:
+  match: data_point
+  where:
+    basis: consent
+    recipient_role: processor
+    source_kind: code
+needs_input:
+  - withdrawal_propagation
+prompt: "When this person withdraws consent, what causes this processor to stop processing?"
+rationale_plain: >
+  Where consent is the basis, section 6(6) says the fiduciary must, within a
+  reasonable time, stop processing and cause its processors to stop. This
+  point names a processor and claims consent. Nothing in the repository shows
+  that a withdrawal reaches that processor.
+rationale_dev: >
+  Detection: basis consent, and a recipient whose role is processor, on a
+  code-observed point. The Act's illustration is a telecom provider whose
+  processor sends bills: when the customer switches to app-only billing, the
+  provider must stop and make the processor stop. Competing reading: the duty
+  arises on withdrawal, so the absence of a propagation path before any
+  withdrawal is not yet a contravention. Tier is arguable. A fiduciary
+  recipient is not a processor and does not match.
+remediation_summary: >
+  Record how a withdrawal is sent to this processor, and how you know it stopped.
+explainer_url: https://sentinel.vettam.ai/rules/DPDP-C-073
+since: "0.6.0"
+changelog:
+  - version: "0.6.0"
+    date: "2026-10-15"
+    note: >
+      Initial rule. Arguable. s.6(6) requires the fiduciary to cause processors
+      to cease on withdrawal; whether a missing path before withdrawal is a
+      contravention is contested, so this is a question.

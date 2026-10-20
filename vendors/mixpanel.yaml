@@ -1,0 +1,28 @@
+id: mixpanel
+vendor: Mixpanel
+match:
+  hosts: ["cdn.mxpnl.com", "api.mixpanel.com", "mixpanel.com"]
+  cookies: ["mp_*", "mixpanel_distinct_id"]
+  storage_keys: ["mp_*"]
+packages:
+  npm: ["mixpanel", "mixpanel-browser"]
+  pypi: ["mixpanel"]
+  maven: ["com.mixpanel:mixpanel-java"]
+  go: ["github.com/mixpanel/mixpanel-go"]
+  rubygems: ["mixpanel-ruby"]
+  cocoapods: ["Mixpanel"]
+  composer: ["mixpanel/mixpanel-php"]
+data_points: [persistent_browser_id, page_url, event_name, ip_address, user_agent, traits]
+category: C4
+flags: [3PF, XFER, PRE]
+role: processor_or_3pf
+lawful_basis: consent
+provisions: ["s.6(1)", "s.8(2)", "s.11(1)(b)", "s.16"]
+notice_itemisation: >
+  A persistent distinct identifier, pages visited, events, IP address, browser
+  details and user traits, sent to Mixpanel for product analytics.
+destination_countries: [US]
+fires_pre_consent_by_default: true
+withdrawal_mechanism: "Stop firing; clear mp_* cookies and localStorage."
+last_verified: "2026-09-15"
+provenance: direct observation

@@ -1,0 +1,111 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^DPDP-C-\\d{3}$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tier": {
+      "type": "string",
+      "enum": [
+        "settled",
+        "arguable",
+        "open"
+      ]
+    },
+    "provisions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "rationale_plain": {
+      "type": "string",
+      "minLength": 1
+    },
+    "rationale_dev": {
+      "type": "string",
+      "minLength": 1
+    },
+    "enforceable_from": {
+      "type": "string",
+      "minLength": 1
+    },
+    "observable": {
+      "type": "boolean"
+    },
+    "needs_input": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "since": {
+      "type": "string",
+      "minLength": 1
+    },
+    "changelog": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "version": {
+            "type": "string",
+            "minLength": 1
+          },
+          "date": {
+            "type": "string",
+            "minLength": 1
+          },
+          "note": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "version",
+          "date",
+          "note"
+        ],
+        "additionalProperties": false
+      },
+      "minItems": 1
+    },
+    "related": {
+      "type": "array",
+      "items": {
+        "$ref": "#/properties/id"
+      }
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "required": [
+    "id",
+    "title",
+    "tier",
+    "provisions",
+    "rationale_plain",
+    "rationale_dev",
+    "enforceable_from",
+    "observable",
+    "needs_input",
+    "since",
+    "changelog",
+    "related",
+    "questions"
+  ],
+  "additionalProperties": false,
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

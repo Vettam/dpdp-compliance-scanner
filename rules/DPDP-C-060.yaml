@@ -10,6 +10,7 @@ flags: [FP]
 categories: []
 owner: engineering
 penalty_band: consent_notice
+sources: [page]
 detection:
   match: api_call
   where:
@@ -43,3 +44,6 @@ changelog:
   - version: "0.3.1"
     date: "2026-09-17"
     note: Detection also matches document.fonts enumeration (spec §4.2).
+  - version: "0.6.0"
+    date: "2026-10-15"
+    note: Declared sources page. Detection is unchanged.

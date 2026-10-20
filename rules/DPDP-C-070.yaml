@@ -1,0 +1,45 @@
+id: DPDP-C-070
+title: Stored personal data has no stated retention
+certainty: arguable
+enforceable_from: "2027-05-13"
+observable: true
+provisions:
+  - s.8(7)
+flags: []
+categories: []
+owner: counsel
+sources: [code]
+penalty_band: retention
+detection:
+  match: data_point
+  where:
+    retention_stated: false
+    source_kind: code
+needs_input:
+  - retention_period
+prompt: "What retention period is stated for this personal data, and when is the purpose no longer served?"
+rationale_plain: >
+  Section 8(7) says personal data is erased once consent is withdrawn or it is
+  reasonable to assume the specified purpose is no longer served, whichever is
+  earlier, unless the law requires it to be kept. A point with no stated
+  period gives nobody a way to tell when that moment is. This is a question
+  for the fiduciary, not a finding that the data is being kept too long.
+rationale_dev: >
+  Detection: a code-observed data point whose retention.stated is empty.
+  s.8(7) requires erasure on withdrawal or when the purpose is no longer
+  served, and the fiduciary must cause its processor to erase too. Competing
+  reading: the section does not by itself require a written period, so silence
+  is not yet a contravention. Tier is arguable and the rule asks for the
+  period instead of emitting a finding.
+remediation_summary: >
+  State how long this data is kept, and the event after which the purpose is
+  no longer served.
+explainer_url: https://sentinel.vettam.ai/rules/DPDP-C-070
+since: "0.6.0"
+changelog:
+  - version: "0.6.0"
+    date: "2026-10-15"
+    note: >
+      Initial rule. Arguable. s.8(7) requires erasure when the purpose is no
+      longer served; it does not, on one reading, require a written period, so
+      an empty statement is a question.

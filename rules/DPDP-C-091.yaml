@@ -1,0 +1,41 @@
+id: DPDP-C-091
+title: Consent claimed, no consent gate observed
+certainty: settled
+enforceable_from: "2027-05-13"
+observable: true
+provisions:
+  - s.6(1)
+  - s.6(10)
+flags: []
+categories: []
+owner: counsel
+sources: [page, code]
+penalty_band: consent_basis
+detection:
+  match: data_point
+  where:
+    basis: consent
+    consent_gate_present: false
+needs_input: []
+rationale_plain: >
+  The map says consent is the basis for this data, and no consent gate is
+  linked to it. Section 6(1) says consent is free, specific, informed,
+  unconditional, and unambiguous, with a clear affirmative action. Section
+  6(10) puts the burden of proving notice and consent on the fiduciary. The
+  claim and the map disagree: the proof is not here.
+rationale_dev: >
+  Detection: basis consent and consent_gate null. Spec §4.6. s.6(1) requires a
+  clear affirmative action. s.6(10): where consent is the basis and a question
+  arises in a proceeding, the Data Fiduciary must prove that notice was given
+  and consent was obtained. A linked gate of any kind stops the match. The
+  finding says the claim and the Act disagree. It does not say the claim is false.
+remediation_summary: >
+  Link the consent gate that records the affirmative act, or correct the basis.
+explainer_url: https://sentinel.vettam.ai/rules/DPDP-C-091
+since: "0.6.0"
+changelog:
+  - version: "0.6.0"
+    date: "2026-10-15"
+    note: >
+      Initial rule. Settled. Consent claimed with no gate leaves the s.6(10)
+      burden of proof unmet on the map.

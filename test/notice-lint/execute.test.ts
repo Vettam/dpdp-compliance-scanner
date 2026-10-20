@@ -1,4 +1,7 @@
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { emptyDataMap } from "../../src/map/io.js";
+import type { DataMap } from "../../src/map/schema.js";
 import { executeNoticeLint, type NoticeLintArgs, type NoticeLintDeps } from "../../src/notice-lint/execute.js";
 import type { Tracker } from "../../src/trackers/schema.js";
 import type { ScanResult } from "../../src/types.js";
@@ -96,4 +99,49 @@ describe("executeNoticeLint", () => {
     expect(code).toBe(0);
     expect(getOut()).not.toContain("NL-100-");
   });
+
+  it("itemises the data map when --scan is omitted", async () => {
+    const { deps, getOut } = makeDeps({ noticeText: "We process orders. You can withdraw consent." });
+    deps.loadDataMap = async () => mapWithPhone();
+    const code = await executeNoticeLint(args(), deps);
+    expect(code).toBe(0);
+    expect(getOut()).toContain("NL-200-dp_users_phone");
+    expect(getOut()).not.toContain("NL-100-");
+  });
+
+  it("keeps --scan on the page inventory when a data map is also available", async () => {
+    const { deps, files } = makeDeps({ scanPath: "findings.json" });
+    deps.loadDataMap = async () => mapWithPhone();
+    await executeNoticeLint(args({ scan: "findings.json", json: true, out: "./out" }), deps);
+    const written = JSON.parse(files.get(join("./out", "notice-lint.json")) ?? "{}") as { checks: Array<{ id: string }> };
+    const ids = written.checks.map((check) => check.id);
+    expect(ids.some((id) => id.startsWith("NL-100-"))).toBe(true);
+    expect(ids.some((id) => id.startsWith("NL-200-"))).toBe(false);
+  });
 });
+
+function mapWithPhone(): DataMap {
+  const map = emptyDataMap({
+    package: "dpdp-compliance-scanner",
+    version: "2.0.0",
+    rules_version: "0.6.0",
+    vendors_version: "1.0.0",
+  });
+  map.data_points.push({
+    id: "dp_users_phone",
+    name: "phone",
+    category: "C8",
+    flags: [],
+    aliases: [],
+    observed: [],
+    recipients: [],
+    consent_gate: null,
+    purpose: "To contact the customer.",
+    basis: "consent",
+    retention: { stated: "", signals: [] },
+    answers: {},
+    notes: "",
+    stale: false,
+  });
+  return map;
+}
