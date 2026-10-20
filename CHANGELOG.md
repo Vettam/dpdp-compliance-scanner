@@ -1,5 +1,19 @@
 # dpdp-compliance-scanner
 
+## 2.1.0
+
+### Minor Changes
+
+- de71b71: Fail a code scan or map diff with `--fail-on unmapped` when the scanner observed something the committed data map does not account for, and report that drift from a git ref. Catalogue drift does not fail the build.
+- de71b71: Record page scans in a committed `.dpdp/data-map.yaml`. Human edits such as `purpose` survive the next scan, and `dpdp map` can init, show, and diff that file.
+- de71b71: Add the dpdp-map skill for recording purpose and basis on the data map, and report a settled finding when a voluntarily-provided basis is claimed for behavioural, advertising, or derived data.
+- de71b71: Add `npm run build:explainers`, which writes one JSON document per rule for the Sentinel site. Rendered explainer pages stay on the site and are not published in this package.
+- de71b71: Scan JavaScript and TypeScript for personal-data columns, inputs, outbound calls, consent gates, retention signals, and rights endpoints, and record them on the data map.
+- de71b71: Scan dependency manifests with `dpdp scan code` and record matched vendor SDKs in the data map. The vendor dataset lives in `vendors/` (version 1.0.0); `trackers/` remains a symlink for this release.
+- de71b71: Add the dpdp-notice skill, which drafts a consent notice or a change notice from the data map, and check a published notice against that map.
+- de71b71: Scan Python for personal-data columns, inputs, outbound calls, consent gates, retention signals, and rights endpoints, and record them on the data map.
+- de71b71: Read retention, rights, processors, consent claims, and code-observed recipients outside India from the data map (rule blocks 070–090).
+
 ## 2.0.0
 
 ### Major Changes
