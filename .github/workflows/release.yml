@@ -16,6 +16,9 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          # npm ci must not see a token that can push to main.
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -32,7 +35,7 @@ jobs:
       - run: npm run build
       - run: npm test
       - name: Create Release Pull Request or Publish
-        uses: changesets/action@v1
+        uses: changesets/action@a45c4d594aa4e2c509dc14a9f2b3b67ba3780d0d # v1.9.0
         with:
           # Must not be an npm script named "publish": npm publish runs that
           # lifecycle script and would call changeset publish a second time.

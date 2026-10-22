@@ -7,5 +7,25 @@ dpdp-scan/
 !skills/dpdp-scan/
 !skills/dpdp-scan/**
 out/
+
+# Credentials. .env.example is the only env file that may be committed.
 .env
-.env.local
+.env.*
+!.env.example
+.npmrc
+*.pem
+*.key
+*.p12
+credentials.json
+
+# Private editor and coding-agent instructions. The published product
+# skills under skills/ stay tracked; CI and the README depend on them.
+.cursor/
+.claude/
+.agents/
+.windsurf/
+.aider*
+AGENTS.md
+CLAUDE.md
+.cursorrules
+.github/copilot-instructions.md
